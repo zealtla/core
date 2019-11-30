@@ -44,6 +44,7 @@
 #include "Anticheat.h"
 #include "MasterPlayer.h"
 #include "PlayerBroadcaster.h"
+#pragma execution_character_set("UTF-8")
 
 // config option SkipCinematics supported values
 enum CinematicsSkipMode
@@ -243,7 +244,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
     {
         data << (uint8)CHAR_CREATE_FAILED;
         SendPacket(&data);
-        sLog.outError("Class: %u or Race %u not found in DBC (Wrong DBC files?) or Cheater?", class_, race_);
+        sLog.outError("职业: %u 或种族 %u 在DBC中不存在 (DBC文件错误?) 或者是作弊者?", class_, race_);
         return;
     }
 
@@ -252,7 +253,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
     {
         data << (uint8)CHAR_NAME_NO_NAME;
         SendPacket(&data);
-        sLog.outError("Account:[%d] but tried to Create character with empty [name]", GetAccountId());
+        sLog.outError("账号:[%d] 尝试创建一个空名字", GetAccountId());
         return;
     }
 
@@ -361,8 +362,8 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
     SendPacket(&data);
 
     std::string IP_str = GetRemoteAddress();
-    BASIC_LOG("Account: %d (IP: %s) Create Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
-    sLog.out(LOG_CHAR, "Account: %d (IP: %s) Create Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
+    BASIC_LOG("账号: %d (IP: %s) 创建了人物:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
+    sLog.out(LOG_CHAR, "账号: %d (IP: %s) 创建了人物:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
     sWorld.LogCharacter(pNewChar, "Create");
     delete pNewChar;                                        // created only to call SaveToDB()
 }
@@ -402,8 +403,8 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket & recv_data)
         return;
 
     std::string IP_str = GetRemoteAddress();
-    BASIC_LOG("Account: %d (IP: %s) Delete Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
-    sLog.out(LOG_CHAR, "Account: %d (IP: %s) Delete Character:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
+    BASIC_LOG("账号: %d (IP: %s) 删除了人物:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
+    sLog.out(LOG_CHAR, "账号: %d (IP: %s) 删除了人物:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
 
     // If the character is online (ALT-F4 logout for example)
     if (Player* onlinePlayer = sObjectAccessor.FindPlayer(guid))
@@ -425,7 +426,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recv_data)
 
     if (PlayerLoading() || GetPlayer() != nullptr)
     {
-        sLog.outError("Player tryes to login again, AccountId = %d", GetAccountId());
+        sLog.outError("玩家尝试再次登录, 账号ID = %d", GetAccountId());
         return;
     }
     if (!playerGuid.IsPlayer())
@@ -504,7 +505,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         // Character found online but not in world ?
         if (HashMapHolder<Player>::Find(playerGuid))
         {
-            sLog.outInfo("[CRASH] Trying to login already ingame character guid %u", playerGuid.GetCounter());
+            sLog.outInfo("[CRASH] 尝试登录已经在游戏的人物 guid %u", playerGuid.GetCounter());
             KickPlayer();
             delete holder;
             m_playerLoading = false;
@@ -711,8 +712,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         SendNotification(LANG_RESET_TALENTS);               // we can use SMSG_TALENTS_INVOLUNTARILY_RESET here
     }
 
-    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST))
-        pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
+    /*if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST))
+        pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);*/
 
     // show time before shutdown if shutdown planned.
     if (sWorld.IsShutdowning())
@@ -729,7 +730,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
     std::string IP_str = GetRemoteAddress();
 
-    sLog.out(LOG_CHAR, "Account: %d (IP: %s) Login Character:[%s] (guid: %u)%s",
+    sLog.out(LOG_CHAR, "账号: %d (IP: %s) 登录了人物:[%s] (guid: %u)%s",
              GetAccountId(), IP_str.c_str(), pCurrChar->GetName(), pCurrChar->GetGUIDLow(), alreadyOnline ? " Player was already online" : "");
     sWorld.LogCharacter(pCurrChar, "Login");
     if (!alreadyOnline && !pCurrChar->IsStandingUp() && !pCurrChar->HasUnitState(UNIT_STAT_STUNNED))
@@ -757,6 +758,21 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     //if (GetWarden())
         //for (int i = 0; i < MAX_MOVE_TYPE; ++i)
             //GetWarden()->SendSpeedChange(UnitMoveType(i), pCurrChar->GetSpeed(UnitMoveType(i)));
+	//玩家上线提示
+	if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST)) //玩家首次登录游戏
+	{
+		char welcome_msg[250];
+		sprintf(welcome_msg,"|cFF1E90FF[系统]:欢迎玩家[|r|cFF00FF00 %s |h|cFF1E90FF]加入|h|cFFFFFF00蚩尤魔兽|h|cFF1E90FF怀旧之旅! |r", pCurrChar->GetName());		
+		sWorld.SendGlobalText(welcome_msg, NULL);
+		//pCurrChar->AddItem(21130, 1); //发送游戏攻略手册
+		pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
+	}
+	else
+	{
+		char loginmsg[100];
+		sprintf(loginmsg, "|cFF1E90FF[系统]:玩家[|r|cff00FF00 %s |h|cFF1E90FF]上线了。|r", pCurrChar->GetName());		
+		sWorld.SendGlobalText(loginmsg, NULL);
+	}
 
     ALL_SESSION_SCRIPTS(this, OnLogin(pCurrChar));
 }
@@ -910,7 +926,7 @@ void WorldSession::HandleChangePlayerNameOpcodeCallBack(QueryResult *result, uin
     CharacterDatabase.PExecute("UPDATE characters set name = '%s', at_login = at_login & ~ %u WHERE guid ='%u'", newname.c_str(), uint32(AT_LOGIN_RENAME), guidLow);
     CharacterDatabase.CommitTransaction();
 
-    sLog.out(LOG_CHAR, "Account: %d (IP: %s) Character:[%s] (guid:%u) Changed name to: %s", session->GetAccountId(), session->GetRemoteAddress().c_str(), oldname.c_str(), guidLow, newname.c_str());
+    sLog.out(LOG_CHAR, "账号: %d (IP: %s) 人物名字:[%s] (guid:%u) 改名为: %s", session->GetAccountId(), session->GetRemoteAddress().c_str(), oldname.c_str(), guidLow, newname.c_str());
 
     WorldPacket data(SMSG_CHAR_RENAME, 1 + 8 + (newname.size() + 1));
     data << uint8(RESPONSE_SUCCESS);
