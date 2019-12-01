@@ -84,6 +84,7 @@
 #include "GuardMgr.h"
 
 #include <chrono>
+#pragma execution_character_set("UTF-8")
 
 INSTANTIATE_SINGLETON_1(World);
 
@@ -1177,7 +1178,7 @@ char const* World::GetPatchName() const
         case 9:
             return "Patch 1.11: Shadow of the Necropolis";
         case 10:
-            return "Patch 1.12: Drums of War";
+            return "°æ±¾ 1.12: Õ½¹ÄÕðÌì";
     }
 
     return "Invalid Patch!";

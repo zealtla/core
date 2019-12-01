@@ -10856,3 +10856,41 @@ void ObjectMgr::GetAreaLocaleString(uint32 entry, int32 loc_idx, std::string* na
                 *namePtr = al->Name[loc_idx].c_str();
     }
 }
+
+//获取玩家名字（带职业颜色）
+std::string ObjectMgr::GetPlayerNameLink(Player* player)
+{
+	std::string name = player->GetName();
+	std::string color;
+	switch (player->GetClass())
+	{	
+	case CLASS_DRUID:
+		color = "|cffFF7D0A";
+		break;
+	case CLASS_HUNTER:
+		color = "|cffABD473";
+		break;
+	case CLASS_MAGE:
+		color = "|cff69CCF0";
+		break;
+	case CLASS_PALADIN:
+		color = "|cffF58CBA";
+		break;
+	case CLASS_PRIEST:
+		color = "|cffFFFFFF";
+		break;
+	case CLASS_ROGUE:
+		color = "|cffFFF569";
+		break;
+	case CLASS_SHAMAN:
+		color = "|cff0070DE";
+		break;
+	case CLASS_WARLOCK:
+		color = "|cff9482C9";
+		break;
+	case CLASS_WARRIOR:
+		color = "|cffC79C6E";
+		break;
+	}
+	return "|Hplayer:" + name + "|h|cffFFFFFF[" + color + name + "|cffFFFFFF]|h|r";
+}

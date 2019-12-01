@@ -573,6 +573,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleModifyMountCommand(char* args);
         bool HandleModifyFactionCommand(char* args);
         bool HandleModifyTalentCommand(char* args);
+		bool HandleWorldCast(char* args); // ¿ΩÁ¡ƒÃÏ
         bool HandleModifyHonorCommand(char* args);
         bool HandleModifyRepCommand(char* args);
         bool HandleModifyGenderCommand(char* args);

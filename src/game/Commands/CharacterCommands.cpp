@@ -37,6 +37,17 @@
 #include "Config/Config.h"
 
 #include <regex>
+#pragma execution_character_set("UTF-8")
+
+#define TEXT_Warrior									  "|cffC79C6E"
+#define TEXT_Paladin									  "|cffF58CBA"
+#define TEXT_Hunter										  "|cffABD473"
+#define TEXT_Rogue										  "|cffFFF569"
+#define TEXT_Priest										  "|cffFFFFFF"
+#define TEXT_Shaman										  "|cff0070DE"
+#define TEXT_Mage										  "|cff69CCF0"
+#define TEXT_Warlock									  "|cff9482C9"
+#define TEXT_Druid										  "|cffFF7d0A"
 
 bool ChatHandler::HandleXpCommand(char* args)
 {
@@ -5140,4 +5151,40 @@ bool ChatHandler::HandleCombatStopCommand(char* args)
     target->CombatStop();
     target->GetHostileRefManager().deleteReferences();
     return true;
+}
+
+//世界聊天
+bool ChatHandler::HandleWorldCast(char* args)
+{
+	std::string argstr = (char*)args;
+	if (argstr == "")
+		return false;
+
+	Player *player = m_session->GetPlayer();
+
+	//聊天消耗金钱设置 10g/p
+	if (player->GetMoney() < 100000)
+	{
+		ChatHandler(player).SendSysMessage("你的金币不够，世界聊天10金/次。");
+		return false;
+	}
+
+	//设置世界聊天等级 40
+	if (m_session->GetPlayer()->GetLevel() < 20)
+	{
+		ChatHandler(m_session->GetPlayer()).SendSysMessage("需要至少20级才能发送世界聊天。");
+		return false;
+	}
+
+	//在世界聊天加上阵营图标		
+	std::string msg = "|cff00ff00[世界]|r";
+	
+	msg += sObjectMgr.GetPlayerNameLink(player);
+	msg += " |cffF4A460";
+	msg += args;	
+		
+	sWorld.SendServerMessage(SERVER_MSG_CUSTOM, msg.c_str());
+	player->ModifyMoney(int32(-100000));
+
+	return true;
 }

@@ -1122,6 +1122,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { MSTR, "spamer",         SEC_MODERATOR,      true, nullptr,                                         "", spamerCommandTable },
         { MSTR, "antispam",       SEC_TICKETMASTER,   true, nullptr,                                         "", AntiSpamCommandTable },
         { MSTR, "gold",           SEC_BASIC_ADMIN,    true, nullptr,                                         "", goldCommandTable },
+		{ NODE,  "sj",			  SEC_PLAYER,         true, &ChatHandler::HandleWorldCast,                   "", nullptr }, //  ¿ΩÁ¡ƒÃÏ
         { MSTR, nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 

@@ -569,7 +569,7 @@ class ObjectMgr
     public:
         ObjectMgr();
         ~ObjectMgr();
-
+		std::string GetPlayerNameLink(Player* player); //获取玩家名字链接
         // Stores all existing ids in the database, not necessarily valid or loaded.
         void LoadAllIdentifiers();
         bool IsExistingItemId(uint32 id) const { return (m_ItemIdSet.find(id) != m_ItemIdSet.end()); }

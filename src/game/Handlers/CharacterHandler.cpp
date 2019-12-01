@@ -762,16 +762,32 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 	if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST)) //玩家首次登录游戏
 	{
 		char welcome_msg[250];
-		sprintf(welcome_msg,"|cFF1E90FF[系统]:欢迎玩家[|r|cFF00FF00 %s |h|cFF1E90FF]加入|h|cFFFFFF00蚩尤魔兽|h|cFF1E90FF怀旧之旅! |r", pCurrChar->GetName());		
-		sWorld.SendGlobalText(welcome_msg, NULL);
+		if (pCurrChar->GetTeam() == ALLIANCE)
+		{
+			snprintf(welcome_msg,250, "|cff00FFFF[系统]：|r欢迎|cff00FFFF联盟|r玩家[|cFF00FF00 %s |r]加入|cFFFF00FF蚩尤魔兽|r怀旧之旅！", pCurrChar->GetName());
+		}
+		else
+		{
+			snprintf(welcome_msg,250, "|cff00FFFF[系统]：|r欢迎|cffff0000部落|r玩家[|cFF00FF00 %s |r]加入|cFFFF00FF蚩尤魔兽|r怀旧之旅! ", pCurrChar->GetName());
+		}
+						
+		sWorld.SendServerMessage(SERVER_MSG_CUSTOM, welcome_msg);
 		//pCurrChar->AddItem(21130, 1); //发送游戏攻略手册
 		pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
 	}
 	else
 	{
 		char loginmsg[100];
-		sprintf(loginmsg, "|cFF1E90FF[系统]:玩家[|r|cff00FF00 %s |h|cFF1E90FF]上线了。|r", pCurrChar->GetName());		
-		sWorld.SendGlobalText(loginmsg, NULL);
+		if (pCurrChar->GetTeam() == ALLIANCE)
+		{
+			snprintf(loginmsg, 100, "|cFF00FFFF[系统]：联盟|r玩家[|cff00FF00 %s |r]上线了。", pCurrChar->GetName());
+		}
+		else
+		{
+			snprintf(loginmsg, 100, "|cFF00FFFF[系统]：|r|cffff0000部落|r玩家[|cff00FF00 %s |r]上线了。", pCurrChar->GetName());
+		}
+						
+		sWorld.SendServerMessage(SERVER_MSG_CUSTOM, loginmsg);
 	}
 
     ALL_SESSION_SCRIPTS(this, OnLogin(pCurrChar));
