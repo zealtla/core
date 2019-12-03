@@ -886,3 +886,111 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket & recv_data)
         TotalCost = _player->DurabilityRepairAll(true, discountMod);
     }
 }
+
+//多职业训练师
+void WorldSession::SendTrainerList_(ObjectGuid guid, uint32 entry)
+{
+	DEBUG_LOG("WORLD: SendTrainerList");
+
+	Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
+	if (!unit)
+	{
+		DEBUG_LOG("WORLD: SendTrainerList - %s not found or you can't interact with him.", guid.GetString().c_str());
+		return;
+	}
+
+	// trainer list loaded at check;
+	if (!unit->IsTrainerOf(_player, true))
+		return;
+
+	CreatureInfo const *ci = unit->GetCreatureInfo();
+	if (!ci)
+		return;
+
+
+	TrainerSpellData const* cSpells = entry ? sObjectMgr.GetNpcTrainerSpells(entry) : unit->GetTrainerSpells();
+	TrainerSpellData const* tSpells = entry ? sObjectMgr.GetNpcTrainerTemplateSpells(entry) : unit->GetTrainerTemplateSpells();
+	//TrainerSpellData const* cSpells = sObjectMgr.GetNpcTrainerSpells(entry);
+	//TrainerSpellData const* tSpells = sObjectMgr.GetNpcTrainerTemplateSpells(entry);
+
+	if (!cSpells && !tSpells)
+	{
+		DEBUG_LOG("WORLD: SendTrainerList - Training spells not found for %s", guid.GetString().c_str());
+		return;
+	}
+	GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK); // Removes stealth, feign death ...
+
+	uint32 maxcount = (cSpells ? cSpells->spellList.size() : 0) + (tSpells ? tSpells->spellList.size() : 0);
+	uint32 trainer_type = cSpells && cSpells->trainerType ? cSpells->trainerType : (tSpells ? tSpells->trainerType : 0);
+
+	std::string strTitle;
+	if (TrainerGreetingLocale const *trainerGreeting = sObjectMgr.GetTrainerGreetingLocale(guid.GetEntry()))
+	{
+		int locale_idx = GetSessionDbLocaleIndex();
+
+		if ((int32)trainerGreeting->Content.size() > locale_idx + 1 && !trainerGreeting->Content[locale_idx + 1].empty())
+			strTitle = trainerGreeting->Content[locale_idx + 1];
+		else
+			strTitle = trainerGreeting->Content[0];
+	}
+	else
+	{
+		strTitle = GetMangosString(LANG_NPC_TAINER_HELLO);
+	}
+
+	WorldPacket data(SMSG_TRAINER_LIST, 8 + 4 + 4 + maxcount * 38 + strTitle.size() + 1);
+	data << ObjectGuid(guid);
+	data << uint32(trainer_type);
+
+	size_t count_pos = data.wpos();
+	data << uint32(maxcount);
+
+	// reputation discount
+	float fDiscountMod = _player->GetReputationPriceDiscount(unit);
+	bool can_learn_primary_prof = GetPlayer()->GetFreePrimaryProfessionPoints() > 0;
+
+	uint32 count = 0;
+
+	if (cSpells)
+	{
+		for (TrainerSpellMap::const_iterator itr = cSpells->spellList.begin(); itr != cSpells->spellList.end(); ++itr)
+		{
+			TrainerSpell const* tSpell = &itr->second;
+
+			uint32 triggerSpell = sSpellMgr.GetSpellEntry(tSpell->spell)->EffectTriggerSpell[0];
+
+			if (!_player->IsSpellFitByClassAndRace(triggerSpell))
+				continue;
+
+			TrainerSpellState state = _player->GetTrainerSpellState(tSpell);
+
+			SendTrainerSpellHelper(data, tSpell, triggerSpell, state, fDiscountMod, can_learn_primary_prof);
+
+			++count;
+		}
+	}
+
+	if (tSpells)
+	{
+		for (TrainerSpellMap::const_iterator itr = tSpells->spellList.begin(); itr != tSpells->spellList.end(); ++itr)
+		{
+			TrainerSpell const* tSpell = &itr->second;
+
+			uint32 triggerSpell = sSpellMgr.GetSpellEntry(tSpell->spell)->EffectTriggerSpell[0];
+
+			if (!_player->IsSpellFitByClassAndRace(triggerSpell))
+				continue;
+
+			TrainerSpellState state = _player->GetTrainerSpellState(tSpell);
+
+			SendTrainerSpellHelper(data, tSpell, triggerSpell, state, fDiscountMod, can_learn_primary_prof);
+
+			++count;
+		}
+	}
+
+	data << strTitle;
+
+	data.put<uint32>(count_pos, count);
+	SendPacket(&data);
+}

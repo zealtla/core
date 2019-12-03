@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
  * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
@@ -21262,4 +21262,41 @@ void Player::CreatePacketBroadcaster()
     // Register player packet queue with the packet broadcaster
     m_broadcaster = std::make_shared<PlayerBroadcaster>(m_session->GetSocket(), GetObjectGuid());
     sWorld.GetBroadcaster()->RegisterPlayer(m_broadcaster);
+}
+
+//查询玩家积分
+uint32 Player::GetJF(uint32 accountId)
+{
+	if (accountId <= 0)
+		return 0;
+
+	uint32 jf = 0;
+	QueryResult* result = LoginDatabase.PQuery("SELECT jf FROM account WHERE id = %u", accountId);
+	if (result)
+	{
+		Field* fields = result->Fetch();
+		jf = fields[0].GetInt32();
+
+		delete result;
+	}
+
+	return jf;
+}
+
+//查询玩家VIP等级
+uint8  Player::GetVipLevel(uint32 accountId)
+{
+	if (accountId <= 0)
+		return 0;
+
+	QueryResult* result = LoginDatabase.PQuery("SELECT vip FROM account WHERE id = %u", accountId);
+	if (result)
+	{
+		Field* fields = result->Fetch();
+		uint8 viplvl = fields[0].GetUInt8();
+		return viplvl;
+		delete result;
+	}
+
+	return 0;
 }

@@ -71,7 +71,7 @@ enum
     AT_ORB_OF_COMMAND           = 3847,
     AT_ENTER_VAEL_ROOM          = 3626,
 
-    EGGS_COUNT                  = 30,
+    EGGS_COUNT                  = 3, //ºÚÒí³²Ñ¨1ºÅBOSS¿ª3µ°¼¤»î
 
     SPELL_NATURE_IMMUNITY       = 7941,
     SPELL_FROST_IMMUNITY        = 7940,

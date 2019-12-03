@@ -356,6 +356,10 @@ class MANGOS_DLL_SPEC WorldSession
         void SendTrainingFailure(ObjectGuid guid, uint32 serviceId, uint32 errorCode);
 
         void SendListInventory(ObjectGuid guid, uint8 menu_type = VENDOR_MENU_ALL);
+		//多职业训练师
+		void SendTrainerList_(ObjectGuid guid, uint32 entry);
+		// 多售卖
+		void SendListInventory_(ObjectGuid vendorGuid, uint32 entry = 0);
         bool CheckBanker(ObjectGuid guid);
         void SendShowBank(ObjectGuid guid);
         bool CheckMailBox(ObjectGuid guid);

@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -5153,7 +5153,7 @@ bool ChatHandler::HandleCombatStopCommand(char* args)
     return true;
 }
 
-//ÊÀ½çÁÄÌì
+//ä¸–ç•ŒèŠå¤©
 bool ChatHandler::HandleWorldCast(char* args)
 {
 	std::string argstr = (char*)args;
@@ -5162,22 +5162,22 @@ bool ChatHandler::HandleWorldCast(char* args)
 
 	Player *player = m_session->GetPlayer();
 
-	//ÁÄÌìÏûºÄ½ğÇ®ÉèÖÃ 10g/p
+	//èŠå¤©æ¶ˆè€—é‡‘é’±è®¾ç½® 10g/p
 	if (player->GetMoney() < 100000)
 	{
-		ChatHandler(player).SendSysMessage("ÄãµÄ½ğ±Ò²»¹»£¬ÊÀ½çÁÄÌì10½ğ/´Î¡£");
+		ChatHandler(player).SendSysMessage("ä½ çš„é‡‘å¸ä¸å¤Ÿï¼Œä¸–ç•ŒèŠå¤©10é‡‘/æ¬¡ã€‚");
 		return false;
 	}
 
-	//ÉèÖÃÊÀ½çÁÄÌìµÈ¼¶ 40
+	//è®¾ç½®ä¸–ç•ŒèŠå¤©ç­‰çº§ 40
 	if (m_session->GetPlayer()->GetLevel() < 20)
 	{
-		ChatHandler(m_session->GetPlayer()).SendSysMessage("ĞèÒªÖÁÉÙ20¼¶²ÅÄÜ·¢ËÍÊÀ½çÁÄÌì¡£");
+		ChatHandler(m_session->GetPlayer()).SendSysMessage("éœ€è¦è‡³å°‘20çº§æ‰èƒ½å‘é€ä¸–ç•ŒèŠå¤©ã€‚");
 		return false;
 	}
 
-	//ÔÚÊÀ½çÁÄÌì¼ÓÉÏÕóÓªÍ¼±ê		
-	std::string msg = "|cff00ff00[ÊÀ½ç]|r";
+	//åœ¨ä¸–ç•ŒèŠå¤©åŠ ä¸Šé˜µè¥å›¾æ ‡		
+	std::string msg = "|cff00ff00[ä¸–ç•Œ]|r";
 	
 	msg += sObjectMgr.GetPlayerNameLink(player);
 	msg += " |cffF4A460";

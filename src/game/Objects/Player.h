@@ -878,6 +878,8 @@ class MANGOS_DLL_SPEC Player final: public Unit
         ~Player() override;
 
         void CleanupsBeforeDelete() override;
+		uint32 GetJF(uint32 accountId); //查询玩家积分
+		uint8 GetVipLevel(uint32 accountId); //查询玩家vip等级
 
         static UpdateMask updateVisualBits;
         static void InitVisibleBits();

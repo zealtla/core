@@ -1281,3 +1281,103 @@ bool WorldSession::CanUseBank(ObjectGuid bankerGUID) const
 
     return true;
 }
+
+//¶àÊÛÂô
+void WorldSession::SendListInventory_(ObjectGuid vendorGuid, uint32 entry)
+{
+	DEBUG_LOG("WORLD: Sent SMSG_LIST_INVENTORY");
+
+	Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_VENDOR);
+
+	if (!pCreature)
+	{
+		DEBUG_LOG("WORLD: SendListInventory - %s not found or you can't interact with him.", vendorGuid.GetString().c_str());
+		_player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, NULL, ObjectGuid(), 0);
+		return;
+	}
+
+	// remove fake death
+	if (GetPlayer()->HasUnitState(UNIT_STAT_DIED))
+		GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
+
+	// Stop the npc if moving
+	if (!pCreature->IsStopped())
+		pCreature->StopMoving();
+
+	//GetPlayer()->m_vip_shop = entry;
+	VendorItemData const* vItems = entry ? sObjectMgr.GetNpcVendorItemList(entry) : pCreature->GetVendorItems();
+	VendorItemData const* tItems = entry ? sObjectMgr.GetNpcVendorTemplateItemList(entry) : pCreature->GetVendorTemplateItems();
+
+	if (!vItems && !tItems)
+	{
+		WorldPacket data(SMSG_LIST_INVENTORY, (8 + 1 + 1));
+		data << ObjectGuid(vendorGuid);
+		data << uint8(0);
+		data << uint8(0);
+		SendPacket(&data);
+		return;
+	}
+
+	uint8 customitems = vItems ? vItems->GetItemCount() : 0;
+	uint8 numitems = customitems + (tItems ? tItems->GetItemCount() : 0);
+
+	uint8 count = 0;
+
+	WorldPacket data(SMSG_LIST_INVENTORY, (8 + 1 + numitems * 7 * 4));
+	data << ObjectGuid(vendorGuid);
+
+	size_t count_pos = data.wpos();
+	data << uint8(count);
+
+	float discountMod = _player->GetReputationPriceDiscount(pCreature);
+
+	for (int i = 0; i < numitems; ++i)
+	{
+		VendorItem const* crItem = i < customitems ? vItems->GetItem(i) : tItems->GetItem(i - customitems);
+
+		if (crItem)
+		{
+			if (ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(crItem->item))
+			{
+				if (!_player->IsGameMaster())
+				{
+					// class wrong item skip only for bindable case
+					if ((pProto->AllowableClass & _player->GetClassMask()) == 0 && pProto->Bonding == BIND_WHEN_PICKED_UP)
+						continue;
+
+					// race wrong item skip always
+					if ((pProto->AllowableRace & _player->GetRaceMask()) == 0)
+						continue;
+
+					// when no faction required but rank > 0 will be used faction id from the vendor faction template to compare the rank
+					if (!pProto->RequiredReputationFaction && pProto->RequiredReputationRank > 0 &&
+						ReputationRank(pProto->RequiredReputationRank) > _player->GetReputationRank(pCreature->getFactionTemplateEntry()->faction))
+						continue;
+				}
+
+				++count;
+
+				// reputation discount
+				uint32 price = uint32(floor(pProto->BuyPrice * discountMod));
+
+				data << uint32(count);
+				data << uint32(crItem->item);
+				data << uint32(pProto->DisplayInfoID);
+				data << uint32(crItem->maxcount <= 0 ? 0xFFFFFFFF : pCreature->GetVendorItemCurrentCount(crItem));
+				data << uint32(price);
+				data << uint32(pProto->MaxDurability);
+				data << uint32(pProto->BuyCount);
+			}
+		}
+	}
+
+	if (count == 0)
+	{
+		data << uint8(0);                                   // "Vendor has no inventory"
+		SendPacket(&data);
+		return;
+	}
+
+	data.put<uint8>(count_pos, count);
+	SendPacket(&data);
+}

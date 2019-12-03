@@ -1,4 +1,4 @@
-/*
+Ôªø/*
  * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
  * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
@@ -244,7 +244,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
     {
         data << (uint8)CHAR_CREATE_FAILED;
         SendPacket(&data);
-        sLog.outError("÷∞“µ: %u ªÚ÷÷◊Â %u ‘⁄DBC÷–≤ª¥Ê‘⁄ (DBCŒƒº˛¥ÌŒÛ?) ªÚ’ﬂ «◊˜±◊’ﬂ?", class_, race_);
+        sLog.outError("ËÅå‰∏ö: %u ÊàñÁßçÊóè %u Âú®DBC‰∏≠‰∏çÂ≠òÂú® (DBCÊñá‰ª∂ÈîôËØØ?) ÊàñËÄÖÊòØ‰ΩúÂºäËÄÖ?", class_, race_);
         return;
     }
 
@@ -253,7 +253,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
     {
         data << (uint8)CHAR_NAME_NO_NAME;
         SendPacket(&data);
-        sLog.outError("’À∫≈:[%d] ≥¢ ‘¥¥Ω®“ª∏ˆø’√˚◊÷", GetAccountId());
+        sLog.outError("Ë¥¶Âè∑:[%d] Â∞ùËØïÂàõÂª∫‰∏Ä‰∏™Á©∫ÂêçÂ≠ó", GetAccountId());
         return;
     }
 
@@ -362,8 +362,8 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
     SendPacket(&data);
 
     std::string IP_str = GetRemoteAddress();
-    BASIC_LOG("’À∫≈: %d (IP: %s) ¥¥Ω®¡À»ÀŒÔ:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
-    sLog.out(LOG_CHAR, "’À∫≈: %d (IP: %s) ¥¥Ω®¡À»ÀŒÔ:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
+    BASIC_LOG("Ë¥¶Âè∑: %d (IP: %s) ÂàõÂª∫‰∫Ü‰∫∫Áâ©:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
+    sLog.out(LOG_CHAR, "Ë¥¶Âè∑: %d (IP: %s) ÂàõÂª∫‰∫Ü‰∫∫Áâ©:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
     sWorld.LogCharacter(pNewChar, "Create");
     delete pNewChar;                                        // created only to call SaveToDB()
 }
@@ -403,8 +403,8 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket & recv_data)
         return;
 
     std::string IP_str = GetRemoteAddress();
-    BASIC_LOG("’À∫≈: %d (IP: %s) …æ≥˝¡À»ÀŒÔ:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
-    sLog.out(LOG_CHAR, "’À∫≈: %d (IP: %s) …æ≥˝¡À»ÀŒÔ:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
+    BASIC_LOG("Ë¥¶Âè∑: %d (IP: %s) Âà†Èô§‰∫Ü‰∫∫Áâ©:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
+    sLog.out(LOG_CHAR, "Ë¥¶Âè∑: %d (IP: %s) Âà†Èô§‰∫Ü‰∫∫Áâ©:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
 
     // If the character is online (ALT-F4 logout for example)
     if (Player* onlinePlayer = sObjectAccessor.FindPlayer(guid))
@@ -426,7 +426,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recv_data)
 
     if (PlayerLoading() || GetPlayer() != nullptr)
     {
-        sLog.outError("ÕÊº“≥¢ ‘‘Ÿ¥Œµ«¬º, ’À∫≈ID = %d", GetAccountId());
+        sLog.outError("Áé©ÂÆ∂Â∞ùËØïÂÜçÊ¨°ÁôªÂΩï, Ë¥¶Âè∑ID = %d", GetAccountId());
         return;
     }
     if (!playerGuid.IsPlayer())
@@ -505,7 +505,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         // Character found online but not in world ?
         if (HashMapHolder<Player>::Find(playerGuid))
         {
-            sLog.outInfo("[CRASH] ≥¢ ‘µ«¬º“—æ≠‘⁄”Œœ∑µƒ»ÀŒÔ guid %u", playerGuid.GetCounter());
+            sLog.outInfo("[CRASH] Â∞ùËØïÁôªÂΩïÂ∑≤ÁªèÂú®Ê∏∏ÊàèÁöÑ‰∫∫Áâ© guid %u", playerGuid.GetCounter());
             KickPlayer();
             delete holder;
             m_playerLoading = false;
@@ -730,7 +730,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
     std::string IP_str = GetRemoteAddress();
 
-    sLog.out(LOG_CHAR, "’À∫≈: %d (IP: %s) µ«¬º¡À»ÀŒÔ:[%s] (guid: %u)%s",
+    sLog.out(LOG_CHAR, "Ë¥¶Âè∑: %d (IP: %s) ÁôªÂΩï‰∫Ü‰∫∫Áâ©:[%s] (guid: %u)%s",
              GetAccountId(), IP_str.c_str(), pCurrChar->GetName(), pCurrChar->GetGUIDLow(), alreadyOnline ? " Player was already online" : "");
     sWorld.LogCharacter(pCurrChar, "Login");
     if (!alreadyOnline && !pCurrChar->IsStandingUp() && !pCurrChar->HasUnitState(UNIT_STAT_STUNNED))
@@ -758,21 +758,21 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     //if (GetWarden())
         //for (int i = 0; i < MAX_MOVE_TYPE; ++i)
             //GetWarden()->SendSpeedChange(UnitMoveType(i), pCurrChar->GetSpeed(UnitMoveType(i)));
-	//ÕÊº“…œœﬂÃ· æ
-	if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST)) //ÕÊº“ ◊¥Œµ«¬º”Œœ∑
+	//Áé©ÂÆ∂‰∏äÁ∫øÊèêÁ§∫
+	if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST)) //Áé©ÂÆ∂È¶ñÊ¨°ÁôªÂΩïÊ∏∏Êàè
 	{
 		char welcome_msg[250];
 		if (pCurrChar->GetTeam() == ALLIANCE)
 		{
-			snprintf(welcome_msg,250, "|cff00FFFF[œµÕ≥]£∫|rª∂”≠|cff00FFFF¡™√À|rÕÊº“[|cFF00FF00 %s |r]º”»Î|cFFFF00FFÚø”»ƒß ﬁ|rª≥æ…÷Æ¬√£°", pCurrChar->GetName());
+			snprintf(welcome_msg,250, "|cff00FFFF[Á≥ªÁªü]Ôºö|rÊ¨¢Ëøé|cff00FFFFËÅîÁõü|rÁé©ÂÆ∂[|cFF00FF00 %s |r]Âä†ÂÖ•|cFFFF00FFËö©Â∞§È≠îÂÖΩ|rÊÄÄÊóß‰πãÊóÖÔºÅ", pCurrChar->GetName());
 		}
 		else
 		{
-			snprintf(welcome_msg,250, "|cff00FFFF[œµÕ≥]£∫|rª∂”≠|cffff0000≤ø¬‰|rÕÊº“[|cFF00FF00 %s |r]º”»Î|cFFFF00FFÚø”»ƒß ﬁ|rª≥æ…÷Æ¬√! ", pCurrChar->GetName());
+			snprintf(welcome_msg,250, "|cff00FFFF[Á≥ªÁªü]Ôºö|rÊ¨¢Ëøé|cffff0000ÈÉ®ËêΩ|rÁé©ÂÆ∂[|cFF00FF00 %s |r]Âä†ÂÖ•|cFFFF00FFËö©Â∞§È≠îÂÖΩ|rÊÄÄÊóß‰πãÊóÖ! ", pCurrChar->GetName());
 		}
 						
 		sWorld.SendServerMessage(SERVER_MSG_CUSTOM, welcome_msg);
-		//pCurrChar->AddItem(21130, 1); //∑¢ÀÕ”Œœ∑π•¬‘ ÷≤·
+		//pCurrChar->AddItem(21130, 1); //ÂèëÈÄÅÊ∏∏ÊàèÊîªÁï•ÊâãÂÜå
 		pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
 	}
 	else
@@ -780,11 +780,11 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 		char loginmsg[100];
 		if (pCurrChar->GetTeam() == ALLIANCE)
 		{
-			snprintf(loginmsg, 100, "|cFF00FFFF[œµÕ≥]£∫¡™√À|rÕÊº“[|cff00FF00 %s |r]…œœﬂ¡À°£", pCurrChar->GetName());
+			snprintf(loginmsg, 100, "|cFF00FFFF[Á≥ªÁªü]ÔºöËÅîÁõü|rÁé©ÂÆ∂[|cff00FF00 %s |r]‰∏äÁ∫ø‰∫Ü„ÄÇ", pCurrChar->GetName());
 		}
 		else
 		{
-			snprintf(loginmsg, 100, "|cFF00FFFF[œµÕ≥]£∫|r|cffff0000≤ø¬‰|rÕÊº“[|cff00FF00 %s |r]…œœﬂ¡À°£", pCurrChar->GetName());
+			snprintf(loginmsg, 100, "|cFF00FFFF[Á≥ªÁªü]Ôºö|r|cffff0000ÈÉ®ËêΩ|rÁé©ÂÆ∂[|cff00FF00 %s |r]‰∏äÁ∫ø‰∫Ü„ÄÇ", pCurrChar->GetName());
 		}
 						
 		sWorld.SendServerMessage(SERVER_MSG_CUSTOM, loginmsg);
@@ -942,7 +942,7 @@ void WorldSession::HandleChangePlayerNameOpcodeCallBack(QueryResult *result, uin
     CharacterDatabase.PExecute("UPDATE characters set name = '%s', at_login = at_login & ~ %u WHERE guid ='%u'", newname.c_str(), uint32(AT_LOGIN_RENAME), guidLow);
     CharacterDatabase.CommitTransaction();
 
-    sLog.out(LOG_CHAR, "’À∫≈: %d (IP: %s) »ÀŒÔ√˚◊÷:[%s] (guid:%u) ∏ƒ√˚Œ™: %s", session->GetAccountId(), session->GetRemoteAddress().c_str(), oldname.c_str(), guidLow, newname.c_str());
+    sLog.out(LOG_CHAR, "Ë¥¶Âè∑: %d (IP: %s) ‰∫∫Áâ©ÂêçÂ≠ó:[%s] (guid:%u) ÊîπÂêç‰∏∫: %s", session->GetAccountId(), session->GetRemoteAddress().c_str(), oldname.c_str(), guidLow, newname.c_str());
 
     WorldPacket data(SMSG_CHAR_RENAME, 1 + 8 + (newname.size() + 1));
     data << uint8(RESPONSE_SUCCESS);
