@@ -83,6 +83,8 @@
 #include "world/world_event_naxxramas.h"
 #include "world/world_event_wareffort.h"
 
+#pragma execution_character_set("UTF-8")
+
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
 #define PLAYER_SKILL_INDEX(x)       (PLAYER_SKILL_INFO_1_1 + ((x)*3))
@@ -426,7 +428,7 @@ Player::Player(WorldSession *session) : Unit(),
     m_objectType |= TYPEMASK_PLAYER;
     m_objectTypeId = TYPEID_PLAYER;
 
-    m_valuesCount = PLAYER_END;
+    m_valuesCount = PLAYER_END;	
 
     m_honorMgr.ClearHonorData();
 
@@ -4565,7 +4567,9 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     //Characters from level 11-19 will suffer from one minute of sickness
     //for each level they are above 10.
     //Characters level 20 and up suffer from ten minutes of sickness.
-    int32 startLevel = sWorld.getConfig(CONFIG_INT32_DEATH_SICKNESS_LEVEL);
+
+	//去掉复活虚弱和装备损耗
+    /* int32 startLevel = sWorld.getConfig(CONFIG_INT32_DEATH_SICKNESS_LEVEL);
 
     if (int32(GetLevel()) >= startLevel)
     {
@@ -4583,7 +4587,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
                 holder->UpdateAuraDuration();
             }
         }
-    }
+    } */
 }
 
 void Player::KillPlayer()
@@ -14378,6 +14382,7 @@ void Player::_LoadIntoDataField(const char* data, uint32 startOffset, uint32 cou
         m_uint32Values[startOffset + index] = atol((*iter).c_str());
 }
 
+//加载玩家数据
 bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
 {
     //       0     1        2     3     4      5       6      7   8      9            10            11
@@ -14432,6 +14437,9 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
 
     // Phasing
     SetWorldMask(fields[57].GetUInt32());
+
+	//获取玩家vip等级
+	m_viplv = fields[58].GetUInt8();
 
     // overwrite some data fields
     SetByteValue(UNIT_FIELD_BYTES_0, 0, fields[3].GetUInt8()); // race
@@ -15964,7 +15972,7 @@ void Player::SaveToDB(bool online, bool force)
                               "honorRankPoints, honorHighestRank, honorStanding, honorLastWeekHK, honorLastWeekCP, honorStoredHK, honorStoredDK, "
                               "watchedFaction, drunk, health, power1, power2, power3, "
                               "power4, power5, exploredZones, equipmentCache, ammoId, actionBars, "
-                              "area, world_phase_mask) "
+                              "area, world_phase_mask, vip) "
                               "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,"
                               "?, ?, ?, ?, ?, "
                               "?, ?, ?, "
@@ -15974,7 +15982,7 @@ void Player::SaveToDB(bool online, bool force)
                               "?, ?, ?, ?, ?, ?, ?, "
                               "?, ?, ?, ?, ?, ?, "
                               "?, ?, ?, ?, ?, ?, "
-                              "?, ?) ");
+                              "?, ?, ?) ");
 
     uberInsert.addUInt32(GetGUIDLow());
     uberInsert.addUInt32(GetSession()->GetAccountId());
@@ -16093,6 +16101,8 @@ void Player::SaveToDB(bool online, bool force)
     // Nostalrius
     uberInsert.addUInt32(GetAreaId());
     uberInsert.addUInt32(GetWorldMask());
+	//更新玩家vip等级
+	uberInsert.addUInt8(GetAccountVip());
     uberInsert.Execute();
 
     _SaveBGData();
@@ -17561,11 +17571,24 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
 
     WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
     data << uint32(ERR_TAXIOK);
-    GetSession()->SendPacket(&data);
+    /*GetSession()->SendPacket(&data);
 
     DEBUG_LOG("WORLD: Sent SMSG_ACTIVATETAXIREPLY");
 
-    GetSession()->SendDoFlight(mount_display_id, sourcepath);
+    GetSession()->SendDoFlight(mount_display_id, sourcepath);*/
+	//开启瞬飞 20190702
+	if (sWorld.getConfig(CONFIG_BOLL_INSTANT_TAXI))
+	{
+		TaxiNodesEntry const* lastnode = sObjectMgr.GetTaxiNodeEntry(nodes[nodes.size() - 1]);
+		m_taxi.ClearTaxiDestinations();
+		TeleportTo(lastnode->map_id, lastnode->x, lastnode->y, lastnode->z, GetOrientation());
+		return false;
+	}
+	else
+	{
+		GetSession()->SendPacket(&data);
+		GetSession()->SendDoFlight(mount_display_id, sourcepath);
+	}
 
     return true;
 }
@@ -17787,7 +17810,7 @@ void Player::InitDataForForm(bool reapplyMods)
     UpdateAttackPowerAndDamage(true);
 }
 
-// Return true is the bought item has a max count to force refresh of window by caller
+// Return true is the bought item has a max count to force refresh of window by caller 玩家从NPC那购买物品
 bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, uint8 bag, uint8 slot)
 {
     // cheating attempt
@@ -17875,6 +17898,60 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
         SendBuyError(BUY_ERR_RANK_REQUIRE, pCreature, item, 0);
         return false;
     }
+
+	//会员NPC 1100004
+	if (pCreature->GetEntry() == 1100004)
+	{
+		bool buysucsessful;
+		
+		//如果玩家元宝数量不够50 13583
+		if (pProto->ItemId == 60000 || pProto->ItemId == 13583)
+		{
+			buysucsessful = true;
+		}
+		else if (pProto->ItemId == 60001)
+		{
+			if (GetVipLevel() < 1)
+				buysucsessful = false;
+			else
+				buysucsessful = true;
+												
+		}
+		else if (pProto->ItemId == 60002)
+		{
+			if (GetVipLevel() < 2)
+				buysucsessful = false;
+			else
+				buysucsessful = true;
+		}
+		else if (pProto->ItemId == 60003)
+		{
+			if (GetVipLevel() < 3)
+				buysucsessful = false;
+			else
+				buysucsessful = true;
+		}
+		else if (pProto->ItemId == 60004)
+		{
+			if (GetVipLevel() < 4)
+				buysucsessful = false;
+			else
+				buysucsessful = true;
+		}
+		else if (pProto->ItemId == 60005)
+		{
+			if (GetVipLevel() < 5)
+				buysucsessful = false;
+			else
+				buysucsessful = true;
+		}
+
+		if (!buysucsessful)		
+		{
+			GetSession()->SendNotification("会员等级不够，无法购买。");
+			return false;
+		}
+	}
 
     uint32 price  = pProto->BuyPrice * count;
 
@@ -21265,13 +21342,14 @@ void Player::CreatePacketBroadcaster()
 }
 
 //查询玩家积分
-uint32 Player::GetJF(uint32 accountId)
+int32 Player::GetJF()
 {
-	if (accountId <= 0)
+	uint32 accountId = m_session->GetAccountId();
+	if (!accountId)
 		return 0;
-
-	uint32 jf = 0;
-	QueryResult* result = LoginDatabase.PQuery("SELECT jf FROM account WHERE id = %u", accountId);
+	
+	int32 jf = 0;
+	QueryResult* result = LoginDatabase.PQuery("SELECT jf FROM account WHERE id = %d", accountId);
 	if (result)
 	{
 		Field* fields = result->Fetch();
@@ -21283,20 +21361,53 @@ uint32 Player::GetJF(uint32 accountId)
 	return jf;
 }
 
-//查询玩家VIP等级
-uint8  Player::GetVipLevel(uint32 accountId)
+uint8 Player::GetAccountVip()
 {
-	if (accountId <= 0)
-		return 0;
-
+	uint32 accountId = m_session->GetAccountId();
 	QueryResult* result = LoginDatabase.PQuery("SELECT vip FROM account WHERE id = %u", accountId);
 	if (result)
 	{
 		Field* fields = result->Fetch();
-		uint8 viplvl = fields[0].GetUInt8();
-		return viplvl;
+		uint8 vip = fields[0].GetUInt8();
+		if (vip >= 0)
+			return vip;
+
 		delete result;
 	}
 
 	return 0;
+}
+
+//修改积分
+void Player::ModifyJF(int32 jf)
+{
+	uint32 accountId = m_session->GetAccountId();
+	if (!accountId)
+		return;
+
+	if (jf == 0)
+		return;
+
+	int32 newjf = GetJF() + jf;	
+	if (newjf < 0)
+		newjf = 0;
+	
+	LoginDatabase.PExecute("UPDATE account SET jf = '%d' WHERE id = '%d'",newjf,accountId);		
+}
+
+void Player::ModifyViplv(uint8 viplv)
+{
+	if (viplv == 0)
+		return;
+
+	uint32 accountId = m_session->GetAccountId();
+	if (!accountId)
+		return;
+
+	LoginDatabase.PExecute("UPDATE account SET vip = '%d' WHERE id = '%d'", viplv, accountId);
+	//更新该账号下所有人物的vip等级
+	CharacterDatabase.PExecute("UPDATE characters SET vip = '%d' WHERE account = '%d'",viplv,accountId);
+	viplv = viplv + 1;
+	ChatHandler(this).PSendSysMessage("您的账号|cffFF0000会员等级|r已经提升为：|cffFF0000 V%d|r，请重新登录游戏生效。", viplv);
+	SaveToDB();
 }

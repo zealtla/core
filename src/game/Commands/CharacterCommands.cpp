@@ -5163,9 +5163,9 @@ bool ChatHandler::HandleWorldCast(char* args)
 	Player *player = m_session->GetPlayer();
 
 	//聊天消耗金钱设置 10g/p
-	if (player->GetMoney() < 100000)
+	if (player->GetMoney() < 10000)
 	{
-		ChatHandler(player).SendSysMessage("你的金币不够，世界聊天10金/次。");
+		ChatHandler(player).SendSysMessage("你的金币不够，世界聊天1金/次。");
 		return false;
 	}
 
@@ -5184,7 +5184,7 @@ bool ChatHandler::HandleWorldCast(char* args)
 	msg += args;	
 		
 	sWorld.SendServerMessage(SERVER_MSG_CUSTOM, msg.c_str());
-	player->ModifyMoney(int32(-100000));
+	player->ModifyMoney(int32(-10000));
 
 	return true;
 }

@@ -48,7 +48,7 @@ public:
     // SOCIAL SYSTEM
     PlayerSocial* GetSocial() const { return m_social; }
     void SetSocial(PlayerSocial* s) { m_social = s; }
-    void LoadSocial(QueryResult* result);
+    void LoadSocial(QueryResult* result);	
 
     // ACTIONS SYSTEM
     void LoadActions(QueryResult *result);
@@ -147,7 +147,7 @@ public:
 
 protected:
 
-    PlayerSocial* m_social;
+    PlayerSocial* m_social;	
     ActionButtonList m_actionButtons;
     WorldSession* m_session;
 

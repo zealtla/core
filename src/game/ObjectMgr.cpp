@@ -58,6 +58,7 @@
 INSTANTIATE_SINGLETON_1(ObjectMgr);
 
 #include "utf8cpp/utf8.h"
+#pragma execution_character_set("UTF-8")
 
 bool normalizePlayerName(std::string& name, size_t max_len)
 {
@@ -10893,4 +10894,34 @@ std::string ObjectMgr::GetPlayerNameLink(Player* player)
 		break;
 	}
 	return "|Hplayer:" + name + "|h|cffFFFFFF[" + color + name + "|cffFFFFFF]|h|r";
+}
+
+//获取玩家vip等级
+std::string ObjectMgr::GetPlayerVipName(Player* player)
+{
+	uint8 pviplv = player->GetVipLevel();	
+	std::string vipname;
+	switch (pviplv)
+	{
+	case 0:
+		vipname = "|cFF8C7853V1.青铜会员";
+		break;
+	case 1:
+		vipname = "|cFFF5F5F5V2.白银会员";
+		break;
+	case 2:
+		vipname = "|cFFFBAF00V3.黄金会员";
+		break;
+	case 3:
+		vipname = "|cFFFFFAFAV4.白金会员";
+		break;
+	case 4:
+		vipname = "|cFFFF00FFV5.王者会员";
+		break;
+	case 5:
+		vipname = "|cFFFF0000V6.至尊会员";
+		break;	
+	}
+
+	return "[" + vipname + "|r]";
 }

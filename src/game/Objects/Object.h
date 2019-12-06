@@ -797,6 +797,9 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         const char* GetName() const { return m_name.c_str(); }
         void SetName(std::string const& newname) { m_name=newname; }
 
+		//获取玩家vip等级
+		uint8 GetVipLevel() const { return m_viplv; }
+
         virtual const char* GetNameForLocaleIdx(int32 /*locale_idx*/) const { return GetName(); }
         virtual uint8 GetGender() const { return 0; } // used in chat builder
 
@@ -1092,6 +1095,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         explicit WorldObject();
 
         std::string m_name;
+		uint8 m_viplv; //玩家vip等级
         ZoneScript* m_zoneScript;
         bool m_isActiveObject;
         // Extra visibility distance for this unit, only used if it is an active object.

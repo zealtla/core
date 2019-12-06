@@ -602,7 +602,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOADMAILS,
     PLAYER_LOGIN_QUERY_LOADMAILEDITEMS,
     PLAYER_LOGIN_QUERY_BATTLEGROUND_DATA,
-    PLAYER_LOGIN_QUERY_FORGOTTEN_SKILLS,
+    PLAYER_LOGIN_QUERY_FORGOTTEN_SKILLS,	
 
     MAX_PLAYER_LOGIN_QUERY
 };
@@ -878,8 +878,10 @@ class MANGOS_DLL_SPEC Player final: public Unit
         ~Player() override;
 
         void CleanupsBeforeDelete() override;
-		uint32 GetJF(uint32 accountId); //查询玩家积分
-		uint8 GetVipLevel(uint32 accountId); //查询玩家vip等级
+		int32 GetJF(); //查询玩家积分		
+		uint8 GetAccountVip(); //查询账号vip等级
+		void ModifyJF(int32 jf); //修改积分
+		void ModifyViplv(uint8 viplv); //修改vip等级
 
         static UpdateMask updateVisualBits;
         static void InitVisibleBits();
@@ -1475,7 +1477,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool ResetTalents(bool no_cost = false);
         void InitTalentForLevel();
         void LearnTalent(uint32 talentId, uint32 talentRank);
-
+		
         /*********************************************************/
         /***                    STAT SYSTEM                    ***/
         /*********************************************************/
@@ -1494,6 +1496,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         float m_ammoDPS;
         float m_personalXpRate;
         uint32 m_foodEmoteTimer;
+		
 
         void RegenerateAll();
         void Regenerate(Powers power);

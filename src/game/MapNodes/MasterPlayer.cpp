@@ -482,3 +482,4 @@ bool MasterPlayer::IsVisibleGloballyFor(MasterPlayer* viewer) const
 
     return true;
 }
+

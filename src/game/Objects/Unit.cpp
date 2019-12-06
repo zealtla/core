@@ -24,6 +24,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "World.h"
+#include "Language.h"
 #include "ObjectMgr.h"
 #include "ObjectGuid.h"
 #include "SpellMgr.h"
@@ -67,6 +68,8 @@
 
 #include <math.h>
 #include <stdarg.h>
+
+#pragma execution_character_set("UTF-8")
 
 //#define DEBUG_DEBUFF_LIMIT
 
@@ -1144,6 +1147,38 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
     if (pVictim != this) // The one who has the fatal blow
         ProcDamageAndSpell(pVictim, PROC_FLAG_KILL, PROC_FLAG_HEARTBEAT, PROC_EX_NONE, 0);
 
+	//pvp杀人通告
+	if ((pPlayerTap && pPlayerVictim) && pPlayerTap != pPlayerVictim)
+	{		
+	    std::string kvipname = sObjectMgr.GetPlayerVipName(pPlayerTap);
+		std::string vvipname = sObjectMgr.GetPlayerVipName(pPlayerVictim);
+		const char* killname = pPlayerTap->GetName();
+		const char* victimname = pPlayerVictim->GetName();		
+
+		//获取地图名字
+		uint32 zone_id, area_id;
+		pPlayerTap->GetZoneAndAreaId(zone_id, area_id);
+		//MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(pPlayerTap->GetMapId());
+		const auto *zoneEntry = AreaEntry::GetById(zone_id);		
+		std::string zoneName;		
+
+		if (zoneEntry)
+		{
+			zoneName = zoneEntry->Name;
+			sObjectMgr.GetAreaLocaleString(zoneEntry->Id, pPlayerTap->GetSession()->GetSessionDbLocaleIndex(), &zoneName);
+		}
+				
+		char pmsg [200];		
+		snprintf(pmsg,200,"|cffFF0000[PVP]：|r|cffFFD700 %s|r %s|cff00FF00%s|r杀死了%s|cff00FF00 %s。|r", zoneName.c_str(), kvipname.c_str(), killname, vvipname.c_str(), victimname);
+
+		sWorld.SendServerMessage(SERVER_MSG_CUSTOM, pmsg);
+		/*WorldPacket data(SMSG_NOTIFICATION, (strlen(pmsg) + 1));
+		data << pmsg;
+		sWorld.SendGlobalMessage(&data);*/
+		
+	}
+	//pvp杀人通告结束
+
     DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE, "DealDamageAttackStop");
 
     // before the stop of combat, the auras of type CM are withdrawn. We must be able to redirect the mobs to the caster.
@@ -1591,7 +1626,7 @@ void Unit::CalculateMeleeDamage(Unit* pVictim, uint32 damage, CalcDamageInfo *da
 
             float reducePercent = frand(low,high);
 
-            // sLog.outString("SkillDiff = %i, reducePercent = %f", SkillDiff, reducePercent); // Pour tests & d茅bug via la console
+            // sLog.outString("SkillDiff = %i, reducePercent = %f", SkillDiff, reducePercent); // Pour tests & débug via la console
 
             damageInfo->cleanDamage += uint32((1.0f - reducePercent) * damageInfo->totalDamage);
             damageInfo->totalDamage = uint32(reducePercent * damageInfo->totalDamage);
@@ -1917,7 +1952,7 @@ void Unit::CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask 
     // Magic damage, check for resists
     bool canResist = (schoolMask & SPELL_SCHOOL_MASK_NORMAL) == 0;
 
-    // NOSTALRIUS: Sorts binaires ne sont pas r茅sist茅s.
+    // NOSTALRIUS: Sorts binaires ne sont pas résistés.
     if (canResist && spellProto && spellProto->IsBinary())
         canResist = false;
     else if (spellProto && spellProto->AttributesEx4 & SPELL_ATTR_EX4_IGNORE_RESISTANCES)
@@ -2303,16 +2338,16 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackT
         int32 maxskill = attackerMaxSkillValueForLevel;
         skill = (skill > maxskill) ? maxskill : skill;
 
-        // (Youfie) Le +skill avant BC ne permet pas de r茅duire la fr茅quence des glancing blows une fois qu'il est 茅gal au niveau du joueur*5
+        // (Youfie) Le +skill avant BC ne permet pas de réduire la fréquence des glancing blows une fois qu'il est égal au niveau du joueur*5
         if (attackerWeaponSkill > maxskill)
             attackerWeaponSkill = maxskill;
 
-        // (Youfie) Chance de glance en Vanilla (inchang茅e par le +skill au del脿 de maxskill, cf. au dessus) :
+        // (Youfie) Chance de glance en Vanilla (inchangée par le +skill au delà de maxskill, cf. au dessus) :
         tmp = (10 + ((victimDefenseSkill - attackerWeaponSkill) * 2)) * 100;
         tmp = tmp > 4000 ? 4000 : tmp;
         if (tmp < 0)
             tmp = 0;
-        // sLog.outString("tmp = %i, Skill = %i, Max Skill = %i", tmp, attackerWeaponSkill, attackerMaxSkillValueForLevel); //Pour tests & d茅bug via la console
+        // sLog.outString("tmp = %i, Skill = %i, Max Skill = %i", tmp, attackerWeaponSkill, attackerMaxSkillValueForLevel); //Pour tests & débug via la console
 
         if (roll < (sum += tmp))
         {
@@ -2644,7 +2679,7 @@ float Unit::MeleeMissChanceCalc(Unit const* pVictim, WeaponAttackType attType) c
         hitChance = m_modMeleeHitChance;
 
     // There is some code in 1.12 that explicitly adds a modifier that causes the first 1% of +hit gained from
-    // talents or gear to be ignored against monsters with more than 10 Defense Skill above the attacking player鈥檚 Weapon Skill.
+    // talents or gear to be ignored against monsters with more than 10 Defense Skill above the attacking player’s Weapon Skill.
     // https://us.forums.blizzard.com/en/wow/t/bug-hit-tables/185675/33
     if (skillDiff < -10 && hitChance > 0.0f)
         hitChance -= 1.0f;

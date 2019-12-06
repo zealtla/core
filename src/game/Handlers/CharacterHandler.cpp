@@ -1,4 +1,4 @@
-Ôªø/*
+/*
  * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
  * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
@@ -44,6 +44,7 @@
 #include "Anticheat.h"
 #include "MasterPlayer.h"
 #include "PlayerBroadcaster.h"
+
 #pragma execution_character_set("UTF-8")
 
 // config option SkipCinematics supported values
@@ -92,7 +93,7 @@ bool LoginQueryHolder::Initialize()
                      "resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, "
                      "honorRankPoints, honorHighestRank, honorStanding, honorLastWeekHK, honorLastWeekCP, honorStoredHK, honorStoredDK, "
                      "watchedFaction, drunk, health, power1, power2, power3, power4, power5, exploredZones, equipmentCache, ammoId, actionBars, "
-                     "world_phase_mask FROM characters WHERE guid = '%u'", m_guid.GetCounter());
+                     "world_phase_mask, vip FROM characters WHERE guid = '%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADGROUP,           "SELECT groupId FROM group_member WHERE memberGuid ='%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADBOUNDINSTANCES,  "SELECT id, permanent, map, resettime FROM character_instance LEFT JOIN instance ON instance = id WHERE guid = '%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADAURAS,           "SELECT caster_guid,item_guid,spell,stackcount,remaincharges,basepoints0,basepoints1,basepoints2,periodictime0,periodictime1,periodictime2,maxduration,remaintime,effIndexMask FROM character_aura WHERE guid = '%u'", m_guid.GetCounter());
@@ -111,7 +112,7 @@ bool LoginQueryHolder::Initialize()
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADSKILLS,          "SELECT skill, value, max FROM character_skills WHERE guid = '%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADMAILS,           "SELECT id,messageType,sender,receiver,subject,itemTextId,expire_time,deliver_time,money,cod,checked,stationery,mailTemplateId,has_items FROM mail WHERE receiver = '%u' ORDER BY id DESC", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADMAILEDITEMS,     "SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, text, mail_id, item_guid, itemEntry, generated_loot FROM mail_items JOIN item_instance ON item_guid = guid WHERE receiver = '%u'", m_guid.GetCounter());
-    res &= SetPQuery(PLAYER_LOGIN_QUERY_FORGOTTEN_SKILLS,    "SELECT skill, value FROM character_forgotten_skills WHERE guid = '%u'", m_guid.GetCounter());
+    res &= SetPQuery(PLAYER_LOGIN_QUERY_FORGOTTEN_SKILLS,    "SELECT skill, value FROM character_forgotten_skills WHERE guid = '%u'", m_guid.GetCounter());	
 
     return res;
 }
@@ -244,7 +245,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
     {
         data << (uint8)CHAR_CREATE_FAILED;
         SendPacket(&data);
-        sLog.outError("ËÅå‰∏ö: %u ÊàñÁßçÊóè %u Âú®DBC‰∏≠‰∏çÂ≠òÂú® (DBCÊñá‰ª∂ÈîôËØØ?) ÊàñËÄÖÊòØ‰ΩúÂºäËÄÖ?", class_, race_);
+        sLog.outError("÷∞“µ: %u ªÚ÷÷◊Â %u ‘⁄DBC÷–≤ª¥Ê‘⁄ (DBCŒƒº˛¥ÌŒÛ?) ªÚ’ﬂ «◊˜±◊’ﬂ?", class_, race_);
         return;
     }
 
@@ -253,7 +254,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
     {
         data << (uint8)CHAR_NAME_NO_NAME;
         SendPacket(&data);
-        sLog.outError("Ë¥¶Âè∑:[%d] Â∞ùËØïÂàõÂª∫‰∏Ä‰∏™Á©∫ÂêçÂ≠ó", GetAccountId());
+        sLog.outError("’À∫≈:[%d] ≥¢ ‘¥¥Ω®“ª∏ˆø’√˚◊÷", GetAccountId());
         return;
     }
 
@@ -357,13 +358,13 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
 
     LoginDatabase.PExecute("DELETE FROM realmcharacters WHERE acctid= '%u' AND realmid = '%u'", GetAccountId(), realmID);
     LoginDatabase.PExecute("INSERT INTO realmcharacters (numchars, acctid, realmid) VALUES (%u, %u, %u)",  _charactersCount, GetAccountId(), realmID);
-
+	
     data << (uint8)CHAR_CREATE_SUCCESS;
     SendPacket(&data);
 
     std::string IP_str = GetRemoteAddress();
-    BASIC_LOG("Ë¥¶Âè∑: %d (IP: %s) ÂàõÂª∫‰∫Ü‰∫∫Áâ©:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
-    sLog.out(LOG_CHAR, "Ë¥¶Âè∑: %d (IP: %s) ÂàõÂª∫‰∫Ü‰∫∫Áâ©:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
+    BASIC_LOG("’À∫≈: %d (IP: %s) ¥¥Ω®¡À»ÀŒÔ:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
+    sLog.out(LOG_CHAR, "’À∫≈: %d (IP: %s) ¥¥Ω®¡À»ÀŒÔ:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), pNewChar->GetGUIDLow());
     sWorld.LogCharacter(pNewChar, "Create");
     delete pNewChar;                                        // created only to call SaveToDB()
 }
@@ -403,8 +404,8 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket & recv_data)
         return;
 
     std::string IP_str = GetRemoteAddress();
-    BASIC_LOG("Ë¥¶Âè∑: %d (IP: %s) Âà†Èô§‰∫Ü‰∫∫Áâ©:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
-    sLog.out(LOG_CHAR, "Ë¥¶Âè∑: %d (IP: %s) Âà†Èô§‰∫Ü‰∫∫Áâ©:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
+    BASIC_LOG("’À∫≈: %d (IP: %s) …æ≥˝¡À»ÀŒÔ:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
+    sLog.out(LOG_CHAR, "’À∫≈: %d (IP: %s) …æ≥˝¡À»ÀŒÔ:[%s] (guid: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), lowguid);
 
     // If the character is online (ALT-F4 logout for example)
     if (Player* onlinePlayer = sObjectAccessor.FindPlayer(guid))
@@ -426,7 +427,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recv_data)
 
     if (PlayerLoading() || GetPlayer() != nullptr)
     {
-        sLog.outError("Áé©ÂÆ∂Â∞ùËØïÂÜçÊ¨°ÁôªÂΩï, Ë¥¶Âè∑ID = %d", GetAccountId());
+        sLog.outError("ÕÊº“≥¢ ‘‘Ÿ¥Œµ«¬º, ’À∫≈ID = %d", GetAccountId());
         return;
     }
     if (!playerGuid.IsPlayer())
@@ -505,7 +506,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         // Character found online but not in world ?
         if (HashMapHolder<Player>::Find(playerGuid))
         {
-            sLog.outInfo("[CRASH] Â∞ùËØïÁôªÂΩïÂ∑≤ÁªèÂú®Ê∏∏ÊàèÁöÑ‰∫∫Áâ© guid %u", playerGuid.GetCounter());
+            sLog.outInfo("[CRASH] ≥¢ ‘µ«¬º“—æ≠‘⁄”Œœ∑µƒ»ÀŒÔ guid %u", playerGuid.GetCounter());
             KickPlayer();
             delete holder;
             m_playerLoading = false;
@@ -540,7 +541,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         m_masterPlayer = new MasterPlayer(this);
         m_masterPlayer->LoadPlayer(GetPlayer());
         m_masterPlayer->LoadActions(holder->GetResult(PLAYER_LOGIN_QUERY_LOADACTIONS));
-        m_masterPlayer->LoadSocial(holder->GetResult(PLAYER_LOGIN_QUERY_LOADSOCIALLIST));
+        m_masterPlayer->LoadSocial(holder->GetResult(PLAYER_LOGIN_QUERY_LOADSOCIALLIST));		
         m_masterPlayer->LoadMails(holder->GetResult(PLAYER_LOGIN_QUERY_LOADMAILS));
         m_masterPlayer->LoadMailedItems(holder->GetResult(PLAYER_LOGIN_QUERY_LOADMAILEDITEMS));
     }
@@ -730,7 +731,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
     std::string IP_str = GetRemoteAddress();
 
-    sLog.out(LOG_CHAR, "Ë¥¶Âè∑: %d (IP: %s) ÁôªÂΩï‰∫Ü‰∫∫Áâ©:[%s] (guid: %u)%s",
+    sLog.out(LOG_CHAR, "’À∫≈: %d (IP: %s) µ«¬º¡À»ÀŒÔ:[%s] (guid: %u)%s",
              GetAccountId(), IP_str.c_str(), pCurrChar->GetName(), pCurrChar->GetGUIDLow(), alreadyOnline ? " Player was already online" : "");
     sWorld.LogCharacter(pCurrChar, "Login");
     if (!alreadyOnline && !pCurrChar->IsStandingUp() && !pCurrChar->HasUnitState(UNIT_STAT_STUNNED))
@@ -758,33 +759,34 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     //if (GetWarden())
         //for (int i = 0; i < MAX_MOVE_TYPE; ++i)
             //GetWarden()->SendSpeedChange(UnitMoveType(i), pCurrChar->GetSpeed(UnitMoveType(i)));
-	//Áé©ÂÆ∂‰∏äÁ∫øÊèêÁ§∫
-	if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST)) //Áé©ÂÆ∂È¶ñÊ¨°ÁôªÂΩïÊ∏∏Êàè
+	//ÕÊº“…œœﬂÃ· æ
+	if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST)) //ÕÊº“ ◊¥Œµ«¬º”Œœ∑
 	{
-		char welcome_msg[250];
+		char welcome_msg [300];
 		if (pCurrChar->GetTeam() == ALLIANCE)
 		{
-			snprintf(welcome_msg,250, "|cff00FFFF[Á≥ªÁªü]Ôºö|rÊ¨¢Ëøé|cff00FFFFËÅîÁõü|rÁé©ÂÆ∂[|cFF00FF00 %s |r]Âä†ÂÖ•|cFFFF00FFËö©Â∞§È≠îÂÖΩ|rÊÄÄÊóß‰πãÊóÖÔºÅ", pCurrChar->GetName());
+			snprintf(welcome_msg,300, "|cff00FFFF[œµÕ≥]£∫|rª∂”≠|cff00FFFF¡™√À|r %sÕÊº“|cFF00FF00%s|rº”»Î|cFFFF00FFÚø”»ƒß ﬁ|r£°",sObjectMgr.GetPlayerVipName(pCurrChar).c_str(), pCurrChar->GetName());
 		}
 		else
 		{
-			snprintf(welcome_msg,250, "|cff00FFFF[Á≥ªÁªü]Ôºö|rÊ¨¢Ëøé|cffff0000ÈÉ®ËêΩ|rÁé©ÂÆ∂[|cFF00FF00 %s |r]Âä†ÂÖ•|cFFFF00FFËö©Â∞§È≠îÂÖΩ|rÊÄÄÊóß‰πãÊóÖ! ", pCurrChar->GetName());
+			snprintf(welcome_msg,300, "|cff00FFFF[œµÕ≥]£∫|rª∂”≠|cffff0000≤ø¬‰|r %sÕÊº“|cFF00FF00%s|rº”»Î|cFFFF00FFÚø”»ƒß ﬁ|r! ", sObjectMgr.GetPlayerVipName(pCurrChar).c_str(), pCurrChar->GetName());
 		}
 						
 		sWorld.SendServerMessage(SERVER_MSG_CUSTOM, welcome_msg);
-		//pCurrChar->AddItem(21130, 1); //ÂèëÈÄÅÊ∏∏ÊàèÊîªÁï•ÊâãÂÜå
+		pCurrChar->AddItem(50000, 1); //–¬»À¥Û¿Ò∞¸
+		pCurrChar->AddItem(50016, 1); //–¬»À◊¯∆Ô
 		pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
 	}
 	else
 	{
-		char loginmsg[100];
+		char loginmsg [120];
 		if (pCurrChar->GetTeam() == ALLIANCE)
 		{
-			snprintf(loginmsg, 100, "|cFF00FFFF[Á≥ªÁªü]ÔºöËÅîÁõü|rÁé©ÂÆ∂[|cff00FF00 %s |r]‰∏äÁ∫ø‰∫Ü„ÄÇ", pCurrChar->GetName());
+			snprintf(loginmsg, 120, "|cFF00FFFF[œµÕ≥]£∫¡™√À|r %sÕÊº“|cff00FF00%s|r…œœﬂ¡À°£", sObjectMgr.GetPlayerVipName(pCurrChar).c_str(), pCurrChar->GetName());
 		}
 		else
 		{
-			snprintf(loginmsg, 100, "|cFF00FFFF[Á≥ªÁªü]Ôºö|r|cffff0000ÈÉ®ËêΩ|rÁé©ÂÆ∂[|cff00FF00 %s |r]‰∏äÁ∫ø‰∫Ü„ÄÇ", pCurrChar->GetName());
+			snprintf(loginmsg, 120, "|cFF00FFFF[œµÕ≥]£∫|r|cffff0000≤ø¬‰|r %sÕÊº“|cff00FF00%s|r…œœﬂ¡À°£", sObjectMgr.GetPlayerVipName(pCurrChar).c_str(), pCurrChar->GetName());
 		}
 						
 		sWorld.SendServerMessage(SERVER_MSG_CUSTOM, loginmsg);
@@ -942,7 +944,7 @@ void WorldSession::HandleChangePlayerNameOpcodeCallBack(QueryResult *result, uin
     CharacterDatabase.PExecute("UPDATE characters set name = '%s', at_login = at_login & ~ %u WHERE guid ='%u'", newname.c_str(), uint32(AT_LOGIN_RENAME), guidLow);
     CharacterDatabase.CommitTransaction();
 
-    sLog.out(LOG_CHAR, "Ë¥¶Âè∑: %d (IP: %s) ‰∫∫Áâ©ÂêçÂ≠ó:[%s] (guid:%u) ÊîπÂêç‰∏∫: %s", session->GetAccountId(), session->GetRemoteAddress().c_str(), oldname.c_str(), guidLow, newname.c_str());
+    sLog.out(LOG_CHAR, "’À∫≈: %d (IP: %s) »ÀŒÔ√˚◊÷:[%s] (guid:%u) ∏ƒ√˚Œ™: %s", session->GetAccountId(), session->GetRemoteAddress().c_str(), oldname.c_str(), guidLow, newname.c_str());
 
     WorldPacket data(SMSG_CHAR_RENAME, 1 + 8 + (newname.size() + 1));
     data << uint8(RESPONSE_SUCCESS);

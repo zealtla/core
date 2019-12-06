@@ -1169,7 +1169,7 @@ bool Creature::IsTrainerOf(Player* pPlayer, bool msg) const
                             pPlayer->PlayerTalkClass->SendGossipMenu(4881, GetObjectGuid());
                             break;
                         case RACE_HUMAN:
-                            pPlayer->PlayerTalkClass->SendGossipMenu(5861, GetObjectGuid());
+                            pPlayer->PlayerTalkClass->SendGossipMenu(4018, GetObjectGuid());
                             break;
                         case RACE_NIGHTELF:
                             pPlayer->PlayerTalkClass->SendGossipMenu(5862, GetObjectGuid());
