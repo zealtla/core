@@ -50,6 +50,8 @@
 #include "GossipDef.h"
 #include "GameEventMgr.h"
 
+#pragma execution_character_set("UTF-8")
+
 void WorldSession::HandleRepopRequestOpcode(WorldPacket & /*recv_data*/)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_REPOP_REQUEST Message");
@@ -809,10 +811,10 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
                 SendBattlegGroundList(pl->GetObjectGuid(), bget->bgTypeId);
             }
             else
-                SendAreaTriggerMessage("You do not meet this Battleground's level requirements.");
+                SendAreaTriggerMessage("你不符合战场等级要求.");
         }
         else
-            SendAreaTriggerMessage("Only %s members can enter the Battleground here.", pl->GetTeam() == ALLIANCE ? "Horde" : "Alliance");
+            SendAreaTriggerMessage("只有 %s 成员才能从这进入战场.", pl->GetTeam() == ALLIANCE ? "Horde" : "Alliance");
         return;
     }
 
@@ -901,7 +903,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
             // corpse not in dungeon or some linked deep dungeons
             if (!instance_map)
             {
-                pl->GetSession()->SendAreaTriggerMessage("You cannot enter %s while in ghost form.", targetMapEntry->name);
+                pl->GetSession()->SendAreaTriggerMessage("灵魂状态无法进入 %s.", targetMapEntry->name);
                 return;
             }
 
@@ -934,7 +936,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         {
             if (!GetPlayer()->GetQuestRewardStatus(9121) && !GetPlayer()->GetQuestRewardStatus(9122) && !GetPlayer()->GetQuestRewardStatus(9123))
             {
-                SendAreaTriggerMessage("You must complete The Dread Citadel to enter Naxxramas");
+                SendAreaTriggerMessage("你必须完成任务：恐怖之城，纳克萨玛斯后才能进入NAXX副本。");
                 return;
             }
         }
@@ -949,13 +951,13 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
             if (missingItem)
                 SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED_AND_ITEM), at->requiredLevel, ObjectMgr::GetItemPrototype(missingItem)->Name1);
             else if (missingQuest)
-                SendAreaTriggerMessage("You must complete %s to enter", sObjectMgr.GetQuestTemplate(missingQuest)->GetTitle().c_str());
+                SendAreaTriggerMessage("你必须完成任务 %s 才能进入", sObjectMgr.GetQuestTemplate(missingQuest)->GetTitle().c_str());
             else if (missingLevel)
                 SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED), missingLevel);
             else if (missingRank)
-                SendAreaTriggerMessage("You must be a %s or higher rank in order to enter the %s.", pl->GetTeam() == HORDE ? HordePvPRankNames[at->required_pvp_rank] : AlliancePvPRankNames[at->required_pvp_rank], targetMapEntry->name);
+                SendAreaTriggerMessage("你必须是 %s或者更高的军衔才能进入 %s.", pl->GetTeam() == HORDE ? HordePvPRankNames[at->required_pvp_rank] : AlliancePvPRankNames[at->required_pvp_rank], targetMapEntry->name);
             else if (missingTeam)
-                SendAreaTriggerMessage("Only %s may enter here", at->required_team == HORDE ? "Horde" : "Alliance");
+                SendAreaTriggerMessage("只允许 %s 才能进入这里", at->required_team == HORDE ? "Horde" : "Alliance");
 
             return;
         }

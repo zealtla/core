@@ -1730,7 +1730,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
         }
         case SPELLFAMILY_WARLOCK:
         {
-            // Life Tap
+            // Life Tap 生命分流
             if (m_spellInfo->IsFitToFamilyMask<CF_WARLOCK_LIFE_TAP>())
             {
                 if (!m_casterUnit)
@@ -1744,6 +1744,10 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 int32 dmg = m_casterUnit->SpellDamageBonusDone(m_casterUnit, m_spellInfo, uint32(cost > 0 ? cost : 0), SPELL_DIRECT_DAMAGE);
                 dmg = m_casterUnit->SpellDamageBonusTaken(m_casterUnit, m_spellInfo, dmg, SPELL_DIRECT_DAMAGE);
 
+				//副本伤害太高，改为生命分流基础值
+				if (int32(m_casterUnit->GetHealth()) <= dmg)
+					dmg = (int32)cost;
+				
                 if (int32(m_casterUnit->GetHealth()) > dmg)
                 {
                     // Shouldn't Appear in Combat Log

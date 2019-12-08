@@ -9953,6 +9953,7 @@ InventoryResult Player::CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec &dest
     return EQUIP_ERR_BANK_FULL;
 }
 
+//玩家能否使用物品
 InventoryResult Player::CanUseItem(Item *pItem, bool not_loading) const
 {
     if (pItem)
@@ -9968,6 +9969,15 @@ InventoryResult Player::CanUseItem(Item *pItem, bool not_loading) const
         ItemPrototype const *pProto = pItem->GetProto();
         if (pProto)
         {
+			//禁止副本外使用宝宝圣符 60006  60007			
+			if (pItem->GetEntry() == 60006 || pItem->GetEntry() == 60007)
+			{				
+				if (!GetMap()->IsDungeon())
+				{
+					return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+				}				
+			}
+
             if (pItem->IsBindedNotWith(this))
                 return EQUIP_ERR_DONT_OWN_THAT_ITEM;
 
@@ -17905,7 +17915,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
 		bool buysucsessful;
 		
 		//如果玩家元宝数量不够50 13583
-		if (pProto->ItemId == 60000 || pProto->ItemId == 13583)
+		if (pProto->ItemId == 60000 || pProto->ItemId == 13583 || pProto->ItemId == 60006 || pProto->ItemId == 60007)
 		{
 			buysucsessful = true;
 		}

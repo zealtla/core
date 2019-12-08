@@ -690,6 +690,23 @@ void Pet::Update(uint32 update_diff, uint32 diff)
         }
         case ALIVE:
         {
+			//去掉宝宝副本buff			
+			if (HasAura(36008))
+			{
+				if (!owner->GetMap()->IsDungeon())
+				{
+					RemoveAurasDueToSpell(36008);
+				}
+			}
+			else if (HasAura(36009))
+			{
+				if (!owner->GetMap()->IsDungeon())
+				{
+					RemoveAurasDueToSpell(36009);
+				}
+			}
+			//去掉宝宝副本buff
+
             if (isControlled())
             {
                 if (owner->GetPetGuid() != GetObjectGuid())
