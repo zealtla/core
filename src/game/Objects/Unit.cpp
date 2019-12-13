@@ -1169,7 +1169,7 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
 		}
 				
 		char pmsg [200];		
-		snprintf(pmsg,200,"|cffFF0000[PVP]£∫|r|cffFFD700 %s|r %s|cff00FF00%s|r…±À¿¡À%s|cff00FF00 %s°£|r", zoneName.c_str(), kvipname.c_str(), killname, vvipname.c_str(), victimname);
+		snprintf(pmsg,200,"|cffFF0000[PVP]:|r|cffFFD700 %s|r %s|cff00FF00%s|r…±À¿¡À%s|cff00FF00 %s°£|r", zoneName.c_str(), kvipname.c_str(), killname, vvipname.c_str(), victimname);
 
 		sWorld.SendServerMessage(SERVER_MSG_CUSTOM, pmsg);
 		/*WorldPacket data(SMSG_NOTIFICATION, (strlen(pmsg) + 1));

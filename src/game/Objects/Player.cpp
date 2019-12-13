@@ -6512,6 +6512,18 @@ void Player::UpdateArea(uint32 newArea)
             SetFFAPvP(false);
     }
 
+	//设置加基森为非PVP区域  zone=440  area=976
+	if ((areaEntry->Flags && AREA_FLAG_ARENA) && areaEntry->Id == 976)
+	{	
+		if (GetFactionTemplateId() != 35)
+			SetFactionTemplateId(35);				
+	}
+	else
+	{		
+		if (GetFactionTemplateId() == 35)
+			SetFactionForRace(GetRace());		
+	}
+
     UpdateAreaDependentAuras();
 }
 
@@ -17915,11 +17927,11 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
 		bool buysucsessful;
 		
 		//如果玩家元宝数量不够50 13583
-		if (pProto->ItemId == 60000 || pProto->ItemId == 13583 || pProto->ItemId == 60006 || pProto->ItemId == 60007)
+		if (pProto->ItemId == 13583 || pProto->ItemId == 60006 || pProto->ItemId == 60007 || (pProto->ItemId >= 60008 && pProto->ItemId <= 60010))
 		{
 			buysucsessful = true;
 		}
-		else if (pProto->ItemId == 60001)
+		else if (pProto->ItemId >= 60011 && pProto->ItemId <= 60013)
 		{
 			if (GetVipLevel() < 1)
 				buysucsessful = false;
@@ -17927,30 +17939,37 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
 				buysucsessful = true;
 												
 		}
-		else if (pProto->ItemId == 60002)
+		else if (pProto->ItemId >= 60014 && pProto->ItemId <= 60016)
 		{
 			if (GetVipLevel() < 2)
 				buysucsessful = false;
 			else
 				buysucsessful = true;
 		}
-		else if (pProto->ItemId == 60003)
+		else if (pProto->ItemId >= 60017 && pProto->ItemId <= 60019)
 		{
 			if (GetVipLevel() < 3)
 				buysucsessful = false;
 			else
 				buysucsessful = true;
 		}
-		else if (pProto->ItemId == 60004)
+		else if (pProto->ItemId >= 60020 && pProto->ItemId <= 60022)
 		{
 			if (GetVipLevel() < 4)
 				buysucsessful = false;
 			else
 				buysucsessful = true;
 		}
-		else if (pProto->ItemId == 60005)
+		else if (pProto->ItemId >= 60023 && pProto->ItemId <= 60025)
 		{
 			if (GetVipLevel() < 5)
+				buysucsessful = false;
+			else
+				buysucsessful = true;
+		}
+		else if (pProto->ItemId >= 60030 && pProto->ItemId <= 60033) //合剂
+		{
+			if (GetVipLevel() < 1)
 				buysucsessful = false;
 			else
 				buysucsessful = true;

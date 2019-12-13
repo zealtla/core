@@ -37,6 +37,7 @@
 #include "Formulas.h"
 #include "GridNotifiersImpl.h"
 #include "Chat.h"
+#pragma execution_character_set("UTF-8")
 
 namespace MaNGOS
 {
@@ -378,9 +379,25 @@ void BattleGround::Update(uint32 diff)
 
                 PlaySoundToAll(SOUND_BG_START);
 
-                //Announce BG starting
+                //Announce BG starting战场开始通知
+				char const* bgName = GetName();
+				std::string bglocalname;
+				//战场通告汉化
+				if (strcmp(bgName, "Warsong Gulch") == 0)
+				{
+					bglocalname = "战歌峡谷";
+				}
+				else if (strcmp(bgName, "Arathi Basin") == 0)
+				{
+					bglocalname = "阿拉希盆地";
+				}
+				else
+				{
+					bglocalname = "奥特兰克山谷";
+				}
+
                 if (sWorld.getConfig(CONFIG_BOOL_BATTLEGROUND_QUEUE_ANNOUNCER_START))
-                    sWorld.SendWorldText(LANG_BG_STARTED_ANNOUNCE_WORLD, GetName(), GetMinLevel(), GetMaxLevel());
+                    sWorld.SendWorldText(LANG_BG_STARTED_ANNOUNCE_WORLD, bglocalname.c_str(), GetMinLevel(), GetMaxLevel());
             }
         }
     }

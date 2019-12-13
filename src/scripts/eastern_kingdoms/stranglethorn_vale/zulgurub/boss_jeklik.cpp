@@ -16,6 +16,7 @@
 
 /* ScriptData
 SDName: Boss_Jeklik
+2019_12_12修改：去掉加血SPELL_GREAT_HEAL，去掉SPELL_BOMB技能
 SD%Complete: 99
 SDComment:
 SDCategory: Zul'Gurub
@@ -329,7 +330,7 @@ struct boss_jeklikAI : public ScriptedAI
                 ShadowWordPain_Timer -= diff;
 
             // GREAT_HEAL
-            if (GreatHeal_Timer < diff)
+            /*if (GreatHeal_Timer < diff)
             {
                 if (!skillStarted)
                 {
@@ -343,7 +344,7 @@ struct boss_jeklikAI : public ScriptedAI
                 }
             }
             else
-                GreatHeal_Timer -= diff;
+                GreatHeal_Timer -= diff;*/
 
             // MIND_FLAY
             if (MindFlay_Timer < diff)
@@ -435,8 +436,10 @@ struct mob_batriderAI : public ScriptedAI
     void SpellHitTarget(Unit* target, const SpellEntry* spell) override
     {
         // Trigger bomb AoE on the ground
-        if (target && spell && spell->Id == SPELL_THROW_LIQUID_FIRE)
-            m_creature->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SPELL_BOMB, false);
+        /*if (target && spell && spell->Id == SPELL_THROW_LIQUID_FIRE)
+            m_creature->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SPELL_BOMB, false);*/
+
+		return;
     }
 
     void UpdateAI(const uint32 diff) override

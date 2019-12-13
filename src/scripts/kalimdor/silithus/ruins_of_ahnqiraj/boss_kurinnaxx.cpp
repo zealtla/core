@@ -15,7 +15,7 @@
  */
 
 /* ScriptData
-SDName: Boss_Kurinnaxx
+SDName: Boss_Kurinnaxx ∑œ–Ê1∫≈ ø‚¡÷ƒ…øÀÀπ
 SD%Complete: 100
 SDComment: Set in DB trap Despawn Time
 SDCategory: Ruins of Ahn'Qiraj
@@ -146,7 +146,7 @@ struct boss_kurinnaxxAI : public ScriptedAI
             m_uiWideSlash_Timer -= uiDiff;
 
         /** Invoque player in front of him */
-        if (m_uiInvocation_Timer < uiDiff)
+        /*if (m_uiInvocation_Timer < uiDiff)
         {
             if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER))
             {
@@ -160,7 +160,7 @@ struct boss_kurinnaxxAI : public ScriptedAI
             }
         }
         else
-            m_uiInvocation_Timer -= uiDiff;
+            m_uiInvocation_Timer -= uiDiff;*/
 
 
         /* Trash */

@@ -1746,10 +1746,24 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
 				//副本伤害太高，改为生命分流基础值
 				if (int32(m_casterUnit->GetHealth()) <= dmg)
-					dmg = (int32)cost;
-				
-                if (int32(m_casterUnit->GetHealth()) > dmg)
+				{
+					dmg = 748;					
+				}
+					
+								
+				if (int32(m_casterUnit->GetHealth()) > dmg)
                 {
+					if (dmg == 0 || dmg > 748)
+					{
+						dmg = 748;
+
+						if (int32(m_casterUnit->GetHealth()) <= dmg)
+						{
+							SendCastResult(SPELL_FAILED_FIZZLE);
+							return;
+						}													
+					}
+						
                     // Shouldn't Appear in Combat Log
                     m_casterUnit->ModifyHealth(-dmg);
 

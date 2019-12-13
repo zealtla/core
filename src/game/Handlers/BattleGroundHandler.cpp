@@ -35,6 +35,7 @@
 #include "ScriptMgr.h"
 #include "World.h"
 #include "Anticheat.h"
+#pragma execution_character_set("UTF-8")
 
 void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket & recv_data)
 {
@@ -109,6 +110,19 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recv_data)
     recv_data >> mapId;
     recv_data >> instanceId;                                // instance id, 0 if First Available selected
     recv_data >> joinAsGroup;                               // join as group
+
+	//战场定时开放
+	//限定战场在10点-24点开放
+	time_t gtime = sWorld.GetGameTime();
+	struct tm *ptminfo = NULL;
+	time(&gtime);
+	ptminfo = localtime(&gtime);
+	int ghour = ptminfo->tm_hour;
+	if (ghour > 23 || ghour < 12) //ghour > 23 || ghour < 10
+	{
+		_player->GetSession()->SendNotification("战场在10:00-24:00点开放，其他时间关闭。");
+		return;
+	}
 
     if (guid == GetPlayer()->GetObjectGuid())
         queuedAtBGPortal = true;

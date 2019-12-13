@@ -38,6 +38,7 @@
 #include "Policies/SingletonImp.h"
 #include <chrono>
 #include <random>
+#pragma execution_character_set("UTF-8")
 
 INSTANTIATE_SINGLETON_1(BattleGroundMgr);
 
@@ -225,6 +226,21 @@ GroupQueueInfo * BattleGroundQueue::AddGroup(Player *leader, Group* grp, BattleG
             if (bg)
             {
                 char const* bgName = bg->GetName();
+				std::string bglocalname;
+				//战场通告汉化
+				if (strcmp(bgName, "Warsong Gulch") == 0)
+				{
+					bglocalname = "战歌峡谷";
+				}
+				else if (strcmp(bgName, "Arathi Basin") == 0)
+				{
+					bglocalname = "阿拉希盆地";
+				}
+				else
+				{
+					bglocalname = "奥特兰克山谷";
+				}
+				
                 uint32 MinPlayers = bg->GetMinPlayersPerTeam();
                 uint32 qHorde = 0;
                 uint32 qAlliance = 0;
@@ -241,13 +257,13 @@ GroupQueueInfo * BattleGroundQueue::AddGroup(Player *leader, Group* grp, BattleG
                 // Show queue status to player only (when joining queue)
                 if (sWorld.getConfig(CONFIG_UINT32_BATTLEGROUND_QUEUE_ANNOUNCER_JOIN) == 1)
                 {
-                    ChatHandler(leader).PSendSysMessage(LANG_BG_QUEUE_ANNOUNCE_SELF, bgName, q_min_level, q_max_level - 1,
+                    ChatHandler(leader).PSendSysMessage(LANG_BG_QUEUE_ANNOUNCE_SELF, bglocalname.c_str(), q_min_level, q_max_level - 1,
                                                         qAlliance, (MinPlayers > qAlliance) ? MinPlayers - qAlliance : (uint32)0, qHorde, (MinPlayers > qHorde) ? MinPlayers - qHorde : (uint32)0);
                 }
                 // System message
                 else
                 {
-                    sWorld.SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level - 1,
+                    sWorld.SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bglocalname.c_str(), q_min_level, q_max_level - 1,
                                          qAlliance, (MinPlayers > qAlliance) ? MinPlayers - qAlliance : (uint32)0, qHorde, (MinPlayers > qHorde) ? MinPlayers - qHorde : (uint32)0);
                 }
             }

@@ -765,16 +765,49 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 		char welcome_msg [300];
 		if (pCurrChar->GetTeam() == ALLIANCE)
 		{
-			snprintf(welcome_msg,300, "|cff00FFFF[系统]：|r欢迎|cff00FFFF联盟|r %s玩家|cFF00FF00%s|r加入|cFFFF00FF蚩尤魔兽|r！",sObjectMgr.GetPlayerVipName(pCurrChar).c_str(), pCurrChar->GetName());
+			snprintf(welcome_msg,300, "|cff00FFFF[系统]：|r欢迎|cff00FFFF联盟|r %s玩家[|cFF00FF00%s|r]加入|cFFFF00FF蚩尤魔兽|r！",sObjectMgr.GetPlayerVipName(pCurrChar).c_str(), pCurrChar->GetName());
 		}
 		else
 		{
-			snprintf(welcome_msg,300, "|cff00FFFF[系统]：|r欢迎|cffff0000部落|r %s玩家|cFF00FF00%s|r加入|cFFFF00FF蚩尤魔兽|r! ", sObjectMgr.GetPlayerVipName(pCurrChar).c_str(), pCurrChar->GetName());
+			snprintf(welcome_msg,300, "|cff00FFFF[系统]：|r欢迎|cffff0000部落|r %s玩家[|cFF00FF00%s|r]加入|cFFFF00FF蚩尤魔兽|r! ", sObjectMgr.GetPlayerVipName(pCurrChar).c_str(), pCurrChar->GetName());
 		}
 						
 		sWorld.SendServerMessage(SERVER_MSG_CUSTOM, welcome_msg);
-		pCurrChar->AddItem(50000, 1); //新人大礼包
-		pCurrChar->AddItem(50016, 1); //新人坐骑
+		pCurrChar->AddItem(50000, 1); //新人大礼包		
+		//发放T0套装
+		switch (pCurrChar->GetClass())
+		{
+		case 1:
+			pCurrChar->AddItem(50020, 1);
+			break;
+		case 2:
+			pCurrChar->AddItem(50021, 1);
+			break;
+		case 3:
+			pCurrChar->AddItem(50022, 1);
+			pCurrChar->AddItem(60006, 1);
+			break;
+		case 7:
+			pCurrChar->AddItem(50023, 1);
+			break;
+		case 4:
+			pCurrChar->AddItem(50024, 1);						
+			break;
+		case 11:
+			pCurrChar->AddItem(50025, 1);
+			break;
+		case 8:
+			pCurrChar->AddItem(50026, 1);
+			break;
+		case 9:
+			pCurrChar->AddItem(50027, 1);
+			pCurrChar->AddItem(60007, 1);
+			break;
+		case 5:
+			pCurrChar->AddItem(50028, 1);
+			break;
+		}
+
 		pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
 	}
 	else
@@ -782,11 +815,11 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 		char loginmsg [120];
 		if (pCurrChar->GetTeam() == ALLIANCE)
 		{
-			snprintf(loginmsg, 120, "|cFF00FFFF[系统]：联盟|r %s玩家|cff00FF00%s|r上线了。", sObjectMgr.GetPlayerVipName(pCurrChar).c_str(), pCurrChar->GetName());
+			snprintf(loginmsg, 120, "|cFF00FFFF[系统]：联盟|r %s玩家[|cff00FF00%s|r]上线了。", sObjectMgr.GetPlayerVipName(pCurrChar).c_str(), pCurrChar->GetName());
 		}
 		else
 		{
-			snprintf(loginmsg, 120, "|cFF00FFFF[系统]：|r|cffff0000部落|r %s玩家|cff00FF00%s|r上线了。", sObjectMgr.GetPlayerVipName(pCurrChar).c_str(), pCurrChar->GetName());
+			snprintf(loginmsg, 120, "|cFF00FFFF[系统]：|r|cffff0000部落|r %s玩家[|cff00FF00%s|r]上线了。", sObjectMgr.GetPlayerVipName(pCurrChar).c_str(), pCurrChar->GetName());
 		}
 						
 		sWorld.SendServerMessage(SERVER_MSG_CUSTOM, loginmsg);
