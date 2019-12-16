@@ -39,15 +39,7 @@
 #include <regex>
 #pragma execution_character_set("UTF-8")
 
-#define TEXT_Warrior									  "|cffC79C6E"
-#define TEXT_Paladin									  "|cffF58CBA"
-#define TEXT_Hunter										  "|cffABD473"
-#define TEXT_Rogue										  "|cffFFF569"
-#define TEXT_Priest										  "|cffFFFFFF"
-#define TEXT_Shaman										  "|cff0070DE"
-#define TEXT_Mage										  "|cff69CCF0"
-#define TEXT_Warlock									  "|cff9482C9"
-#define TEXT_Druid										  "|cffFF7d0A"
+#define MSG_COLOR_ROYALBLUE "|cff00FFFF"
 
 bool ChatHandler::HandleXpCommand(char* args)
 {
@@ -5156,35 +5148,32 @@ bool ChatHandler::HandleCombatStopCommand(char* args)
 //世界聊天
 bool ChatHandler::HandleWorldCast(char* args)
 {
-	std::string argstr = (char*)args;
-	if (argstr == "")
+	if (!*args)		
 		return false;
 
 	Player *player = m_session->GetPlayer();
 
 	//聊天消耗金钱设置 10g/p
-	if (player->GetMoney() < 10000)
+	if (player->GetMoney() < 100000)
 	{
-		ChatHandler(player).SendSysMessage("你的金币不够，世界聊天1金/次。");
+		ChatHandler(player).SendSysMessage("你的金币不够，世界聊天10金/次。");
 		return false;
 	}
 
 	//设置世界聊天等级 40
-	if (m_session->GetPlayer()->GetLevel() < 20)
+	if (m_session->GetPlayer()->GetLevel() < 50)
 	{
-		ChatHandler(m_session->GetPlayer()).SendSysMessage("需要至少20级才能发送世界聊天。");
+		ChatHandler(player).SendSysMessage("需要至少50级才能发送世界聊天。");
 		return false;
 	}
 
-	//在世界聊天加上阵营图标		
-	std::string msg = "|cff00ff00[世界]|r";
-	
-	msg += sObjectMgr.GetPlayerNameLink(player);
-	msg += " |cffF4A460";
-	msg += args;	
-		
-	sWorld.SendServerMessage(SERVER_MSG_CUSTOM, msg.c_str());
-	player->ModifyMoney(int32(-10000));
+	//在世界聊天加上阵营图标
+	char msg[1024];
+	snprintf(msg, 1024, "|cff00ff00[世界]|r %s: %s%s|r", sObjectMgr.GetPlayerNameLink(player).c_str(), MSG_COLOR_ROYALBLUE, args);
+			
+	sWorld.SendServerMessage(SERVER_MSG_CUSTOM, msg);
+	player->ModifyMoney(int32(-100000));
+	ChatHandler(player).SendSysMessage("世界聊天发送成功，扣除10金币。");
 
 	return true;
 }

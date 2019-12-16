@@ -548,12 +548,43 @@ void BattleGround::RewardHonorToTeam(uint32 Honor, Team teamId)
     }
 }
 
+//混排战场
 void BattleGround::RewardReputationToTeam(uint32 faction_id, uint32 Reputation, Team teamId)
 {
     FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(faction_id);
 
     if (!factionEntry)
         return;
+
+	// 切换到对方阵营	
+	FactionEntry const* factionEntry2;
+	switch (faction_id)
+	{
+	case 729:
+		factionEntry2 = sObjectMgr.GetFactionEntry(730);
+		break;
+	case 730:
+		factionEntry2 = sObjectMgr.GetFactionEntry(729);
+		break;
+	case 889:
+		factionEntry2 = sObjectMgr.GetFactionEntry(890);
+		break;
+	case 890:
+		factionEntry2 = sObjectMgr.GetFactionEntry(889);
+		break;
+	case 509:
+		factionEntry2 = sObjectMgr.GetFactionEntry(510);
+		break;
+	case 510:
+		factionEntry2 = sObjectMgr.GetFactionEntry(509);
+		break;
+	default:
+		break;
+	}
+
+	if (!factionEntry)
+		return;
+	//混排战场结束
 
     for (BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
@@ -572,7 +603,15 @@ void BattleGround::RewardReputationToTeam(uint32 faction_id, uint32 Reputation, 
         {
             int32 rep_change;
             rep_change = plr->CalculateReputationGain(REPUTATION_SOURCE_SPELL, Reputation, faction_id);
-            plr->GetReputationMgr().ModifyReputation(factionEntry, rep_change);
+            
+			if (plr->GetTeam() == plr->TeamForRace(plr->GetRace()))
+			{
+				plr->GetReputationMgr().ModifyReputation(factionEntry, rep_change);
+			}
+			else
+			{
+				plr->GetReputationMgr().ModifyReputation(factionEntry2, rep_change);
+			}
         }
     }
 }
@@ -979,6 +1018,31 @@ void BattleGround::AddPlayer(Player *plr)
     // remove afk from player
     if (plr->IsAFK())
         plr->ToggleAFK();
+
+	//混排战场
+	// enter battleground 进入战场
+	// change team to stay balance 修改队伍以维持战场平衡
+	// team may be different with in battleground queue
+	uint32 hordePlayers = GetPlayersCountByTeam(HORDE);
+	uint32 alliancePlayers = GetPlayersCountByTeam(ALLIANCE);
+
+	if (hordePlayers < alliancePlayers) // IF alliance more than horde
+	{
+		plr->SetFactionForRace(RACE_ORC);
+		plr->SetBGTeam(HORDE);
+	}
+	else if (hordePlayers > alliancePlayers) // IF horde more than alliance
+	{
+		plr->SetFactionForRace(RACE_HUMAN);
+		plr->SetBGTeam(ALLIANCE);
+	}
+	else // IF balance
+	{
+		if (plr->GetBGTeam() == HORDE) // IF player is a real horde, enter battleground as a horde
+			plr->SetFactionForRace(RACE_ORC);
+		else // IF player is a real alliance, enter battleground as an alliance
+			plr->SetFactionForRace(RACE_HUMAN);
+	}
 
     // score struct must be created in inherited class
 
