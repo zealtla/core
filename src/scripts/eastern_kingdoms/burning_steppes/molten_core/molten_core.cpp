@@ -424,7 +424,7 @@ struct mob_firelordAI : public ScriptedAI
 
     void Reset() override
     {
-        m_uiSummonLavaSpawnTimer  = urand(7500, 12500);
+        //m_uiSummonLavaSpawnTimer  = urand(7500, 12500);
         m_uiSoulBurnTimer         = urand(4000, 6000);
     }
 
@@ -445,12 +445,12 @@ struct mob_firelordAI : public ScriptedAI
             return;
 
         //Summon Lava Spawn
-        if (m_uiSummonLavaSpawnTimer < uiDiff)
+        /*if (m_uiSummonLavaSpawnTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_LAVASPAWN) == CAST_OK)
                 m_uiSummonLavaSpawnTimer = urand(15000, 20000);
         }
-        else m_uiSummonLavaSpawnTimer -= uiDiff;
+        else m_uiSummonLavaSpawnTimer -= uiDiff;*/
 
         // Soul Burn
         if (m_uiSoulBurnTimer < uiDiff)

@@ -882,6 +882,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
 		uint8 GetAccountVip(); //查询账号vip等级
 		void ModifyJF(int32 jf); //修改积分
 		void ModifyViplv(uint8 viplv); //修改vip等级
+		void GetVipAmu(uint8 viplv,uint8 type); //获取vip饰品
 
         static UpdateMask updateVisualBits;
         static void InitVisibleBits();

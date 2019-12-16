@@ -1137,9 +1137,9 @@ void SendDefaultMenu_VipNpc(Player* player, Creature* _creature, uint32 action)
 		break;
 	case GOSSIP_ACTION_INFO_DEF + 17: //购买会员物品
 		player->ADD_GOSSIP_ITEM(1, "杂类", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 27);
-		player->ADD_GOSSIP_ITEM(1, "装备", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 28);
-		player->ADD_GOSSIP_ITEM(1, "武器", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 29);
-		//player->ADD_GOSSIP_ITEM(1, "装备", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 30);		
+		player->ADD_GOSSIP_ITEM(1, "衬衣", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 28);
+		//player->ADD_GOSSIP_ITEM(1, "武器", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 29);
+		player->ADD_GOSSIP_ITEM(1, "领取会员饰品", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 30);		
 
 		player->ADD_GOSSIP_ITEM(0, "返回<-[主菜单]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 21);
 		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _creature->GetGUID());
@@ -1308,20 +1308,38 @@ void SendDefaultMenu_VipNpc(Player* player, Creature* _creature, uint32 action)
 		player->PlayerTalkClass->ClearMenus();
 		player->GetSession()->SendListInventory_(_creature->GetGUID(), 1100008);
 		break;
-	case GOSSIP_ACTION_INFO_DEF + 29: //武器
-		player->PlayerTalkClass->ClearMenus();
-		player->GetSession()->SendListInventory_(_creature->GetGUID(), 1100009);
-		break;
-	//case GOSSIP_ACTION_INFO_DEF + 30: //装备 1100010
+	//case GOSSIP_ACTION_INFO_DEF + 29: //武器
 	//	player->PlayerTalkClass->ClearMenus();
-	//	player->GetSession()->SendListInventory_(_creature->GetGUID(), 1100010);
+	//	player->GetSession()->SendListInventory_(_creature->GetGUID(), 1100009);
 	//	break;
+	case GOSSIP_ACTION_INFO_DEF + 30: //会员饰品
+		player->ADD_GOSSIP_ITEM(0, "领取|cffFF00FF近战|r饰品\r\n ...........................", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 32);
+		player->ADD_GOSSIP_ITEM(0, "领取|cffFF00FF远程|r饰品\r\n ...........................", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 33);
+		player->ADD_GOSSIP_ITEM(0, "领取|cffFF00FF法系|r饰品\r\n ...........................", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 34);
+		player->ADD_GOSSIP_ITEM(0, "会员饰品最多只能带1个，可以自行领取更换饰品类型。", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 35);
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _creature->GetGUID());
+		break;
 	case GOSSIP_ACTION_INFO_DEF + 31: //会员升级介绍	
 		player->CLOSE_GOSSIP_MENU();
 		break;
 	case GOSSIP_ACTION_INFO_DEF + 18: //修改名字
 	case GOSSIP_ACTION_INFO_DEF + 19: //修改种族
 		_creature->MonsterWhisper("|cff00FFFF暂未开通服务。|r", player);
+		player->CLOSE_GOSSIP_MENU();
+		break;
+	case GOSSIP_ACTION_INFO_DEF + 32:
+		player->GetVipAmu(player->GetAccountVip(), 1);
+		player->CLOSE_GOSSIP_MENU();
+		break;
+	case GOSSIP_ACTION_INFO_DEF + 33:
+		player->GetVipAmu(player->GetAccountVip(), 2);
+		player->CLOSE_GOSSIP_MENU();
+		break;
+	case GOSSIP_ACTION_INFO_DEF + 34:
+		player->GetVipAmu(player->GetAccountVip(), 3);
+		player->CLOSE_GOSSIP_MENU();
+		break;
+	case GOSSIP_ACTION_INFO_DEF + 35:
 		player->CLOSE_GOSSIP_MENU();
 		break;
 	case GOSSIP_ACTION_INFO_DEF + 20: //查询积分

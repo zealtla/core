@@ -779,32 +779,41 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 		{
 		case 1:
 			pCurrChar->AddItem(50020, 1);
+			pCurrChar->AddItem(61100, 1);
 			break;
 		case 2:
 			pCurrChar->AddItem(50021, 1);
+			pCurrChar->AddItem(61100, 1);
 			break;
 		case 3:
 			pCurrChar->AddItem(50022, 1);
 			pCurrChar->AddItem(60006, 1);
+			pCurrChar->AddItem(61101, 1);
 			break;
 		case 7:
 			pCurrChar->AddItem(50023, 1);
+			pCurrChar->AddItem(61102, 1);
 			break;
 		case 4:
-			pCurrChar->AddItem(50024, 1);						
+			pCurrChar->AddItem(50024, 1);
+			pCurrChar->AddItem(61100, 1);
 			break;
 		case 11:
 			pCurrChar->AddItem(50025, 1);
+			pCurrChar->AddItem(61102, 1);
 			break;
 		case 8:
 			pCurrChar->AddItem(50026, 1);
+			pCurrChar->AddItem(61102, 1);
 			break;
 		case 9:
 			pCurrChar->AddItem(50027, 1);
 			pCurrChar->AddItem(60007, 1);
+			pCurrChar->AddItem(61102, 1);
 			break;
 		case 5:
 			pCurrChar->AddItem(50028, 1);
+			pCurrChar->AddItem(61102, 1);
 			break;
 		}
 

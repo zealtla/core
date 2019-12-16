@@ -28,7 +28,7 @@ enum
 //    SPELL_FIRENOVA       = 23462,
     SPELL_FLAMESTRIKE    = 16419, // Ustaag : en remplacement de SPELL_FIRENOVA
     SPELL_CLEAVE         = 15284, // Ustaag : ancien cleave 20691
-    SPELL_CONFLIGURATION = 16805,
+    SPELL_CONFLIGURATION = 16805, //»º…’
     SPELL_THUNDERCLAP    = 15548,                            //Not sure if right ID. 23931 would be a harder possibility.
     SPELL_RAGE           = 16789, // Ustaag : ajout
     SPELL_PIERCEARMOR   = 12097
@@ -83,13 +83,13 @@ struct boss_drakkisathAI : public ScriptedAI
             m_uiCleaveTimer -= uiDiff;
 
         // Confliguration
-        if (m_uiConfligurationTimer < uiDiff)
+        /*if (m_uiConfligurationTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CONFLIGURATION, 0, m_creature->GetVictim()->GetGUID()) == CAST_OK)
                 m_uiConfligurationTimer = 18000;
         }
         else
-            m_uiConfligurationTimer -= uiDiff;
+            m_uiConfligurationTimer -= uiDiff;*/
 
         // Thunderclap
         if (m_uiThunderclapTimer < uiDiff)

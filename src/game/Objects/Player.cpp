@@ -21393,7 +21393,7 @@ int32 Player::GetJF()
 uint8 Player::GetAccountVip()
 {
 	uint32 accountId = m_session->GetAccountId();
-	QueryResult* result = LoginDatabase.PQuery("SELECT vip FROM account WHERE id = %u", accountId);
+	QueryResult* result = LoginDatabase.PQuery("SELECT vip FROM account WHERE id = '%u'", accountId);
 	if (result)
 	{
 		Field* fields = result->Fetch();
@@ -21439,4 +21439,88 @@ void Player::ModifyViplv(uint8 viplv)
 	viplv = viplv + 1;
 	ChatHandler(this).PSendSysMessage("您的账号|cffFF0000会员等级|r已经提升为：|cffFF0000 V%d|r，请重新登录游戏生效。", viplv);
 	SaveToDB();
+}
+
+//获取会员饰品
+void Player::GetVipAmu(uint8 viplv,uint8 type)
+{
+	if (type > 3 || type < 1)
+		return;
+
+	if (viplv > 5)
+		return;
+
+	uint32 itemid;
+	//3类：1.近战 2.远程 3.法系
+	//			V1		V2		V3		V4		V5		V6
+	//	近战	61100	61103	61106	61109	61112	61115
+	//	远程	61101	61104	61107	61110	61113	61116
+	//	法系	61102	61105	61108	61111	61114	61117
+
+	switch (type)
+	{	
+	case 1: //近战
+		if (viplv == 0)
+			itemid = 61100;
+		else if (viplv == 1)
+			itemid = 61103;
+		else if (viplv == 2)
+			itemid = 61106;
+		else if (viplv == 3)
+			itemid = 61109;
+		else if (viplv == 4)
+			itemid = 61112;
+		else if (viplv == 5)
+			itemid = 61115;
+						
+		break;
+	case 2: //远程
+		if (viplv == 0)
+			itemid = 61101;
+		else if (viplv == 1)
+			itemid = 61104;
+		else if (viplv == 2)
+			itemid = 61107;
+		else if (viplv == 3)
+			itemid = 61110;
+		else if (viplv == 4)
+			itemid = 61113;
+		else if (viplv == 5)
+			itemid = 61116;
+
+		break;
+	case 3: //法系
+		if (viplv == 0)
+			itemid = 61102;
+		else if (viplv == 1)
+			itemid = 61105;
+		else if (viplv == 2)
+			itemid = 61108;
+		else if (viplv == 3)
+			itemid = 61111;
+		else if (viplv == 4)
+			itemid = 61114;
+		else if (viplv == 5)
+			itemid = 61117;
+
+		break;	
+	}
+
+	if (itemid > 0 && !HasItemCount(itemid, 1, true))
+		AddItem(itemid, 1);
+	else if (HasItemCount(itemid, 1, true))
+	{
+		GetSession()->SendNotification("你已经有了该物品。");
+		return;
+	}
+
+	//删除饰品,防止玩家装备2个会员饰品
+	uint32 AmuID[18] = {61100, 61101, 61102, 61103, 61104, 61105, 61106, 61107, 61108, 61109, 61110, 61111, 61112, 61113, 61114, 61115, 61116, 61117};
+	for (int i = 0; i < 18; i++)
+	{
+		if (HasItemCount(AmuID[i], 1, true) && AmuID[i] != itemid)
+			DestroyItemCount(AmuID[i], 1, true, false, true);
+
+	}
+
 }
